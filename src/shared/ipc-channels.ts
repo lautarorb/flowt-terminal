@@ -52,4 +52,8 @@ export const IPC = {
   CLAUDE_SHOW: 'claude:show',
   CLAUDE_HIDE: 'claude:hide',
   CLAUDE_RELOAD: 'claude:reload',
+
+  // Checklists
+  CHECKLISTS_LOAD: 'checklists:load',
+  CHECKLISTS_SAVE: 'checklists:save',
 } as const;

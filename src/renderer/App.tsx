@@ -3,6 +3,7 @@ import { useTabs } from './hooks/useTabs';
 import { usePreview } from './hooks/usePreview';
 import { useNotes } from './hooks/useNotes';
 import { useLogs } from './hooks/useLogs';
+import { useChecklists } from './hooks/useChecklists';
 import SplitLayout from './components/layout/SplitLayout';
 import LeftPanel from './components/layout/LeftPanel';
 import RightPanel from './components/layout/RightPanel';
@@ -13,6 +14,12 @@ export default function App() {
   const { url, status, activeDevice, navigate, selectDevice, updateBounds, setUrl } = usePreview();
   const { content: notesContent, isOpen: notesOpen, updateContent: updateNotes, toggle: toggleNotes, close: closeNotes } = useNotes();
   const { logs, allLogs, filter: logFilter, setFilter: setLogFilter, isOpen: logsOpen, toggleOpen: toggleLogs, clearLogs } = useLogs();
+  const {
+    lists: checklists, activeListId: activeChecklistId, setActiveListId: setActiveChecklistId, isOpen: checklistsOpen,
+    addList: addChecklist, removeList: removeChecklist, renameList: renameChecklist,
+    addItem: addChecklistItem, toggleItem: toggleChecklistItem, removeItem: removeChecklistItem,
+    toggle: toggleChecklists, close: closeChecklists,
+  } = useChecklists();
   const [mdOpen, setMdOpen] = useState(false);
   const inputBarRef = useRef<InputBarHandle>(null);
 
@@ -101,11 +108,23 @@ export default function App() {
           notesContent={notesContent}
           notesOpen={notesOpen}
           onNotesChange={updateNotes}
-          onNotesToggle={() => { toggleNotes(); setMdOpen(false); }}
+          onNotesToggle={() => { toggleNotes(); setMdOpen(false); closeChecklists(); }}
           onNotesClose={closeNotes}
           mdOpen={mdOpen}
-          onMdToggle={() => { setMdOpen((v) => !v); closeNotes(); }}
+          onMdToggle={() => { setMdOpen((v) => !v); closeNotes(); closeChecklists(); }}
           onMdClose={() => setMdOpen(false)}
+          checklistsOpen={checklistsOpen}
+          onChecklistsToggle={() => { toggleChecklists(); closeNotes(); setMdOpen(false); }}
+          onChecklistsClose={closeChecklists}
+          checklists={checklists}
+          activeChecklistId={activeChecklistId}
+          onSelectChecklist={setActiveChecklistId}
+          onAddChecklist={addChecklist}
+          onRemoveChecklist={removeChecklist}
+          onRenameChecklist={renameChecklist}
+          onAddChecklistItem={addChecklistItem}
+          onToggleChecklistItem={toggleChecklistItem}
+          onRemoveChecklistItem={removeChecklistItem}
         />
       }
       right={

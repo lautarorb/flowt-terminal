@@ -6,6 +6,8 @@ import QuickResponse from '../terminal/QuickResponse';
 import InputBar, { InputBarHandle } from '../terminal/InputBar';
 import NotesPanel from '../panels/NotesPanel';
 import MarkdownPanel from '../panels/MarkdownPanel';
+import ChecklistPanel from '../panels/ChecklistPanel';
+import { Checklist } from '../../hooks/useChecklists';
 
 interface Props {
   tabs: TabState[];
@@ -24,6 +26,18 @@ interface Props {
   mdOpen: boolean;
   onMdToggle: () => void;
   onMdClose: () => void;
+  checklistsOpen: boolean;
+  onChecklistsToggle: () => void;
+  onChecklistsClose: () => void;
+  checklists: Checklist[];
+  activeChecklistId: string | null;
+  onSelectChecklist: (id: string) => void;
+  onAddChecklist: () => void;
+  onRemoveChecklist: (id: string) => void;
+  onRenameChecklist: (id: string, name: string) => void;
+  onAddChecklistItem: (listId: string, text: string) => void;
+  onToggleChecklistItem: (listId: string, itemId: string) => void;
+  onRemoveChecklistItem: (listId: string, itemId: string) => void;
 }
 
 const LeftPanel = forwardRef<InputBarHandle, Props>(({
@@ -43,6 +57,18 @@ const LeftPanel = forwardRef<InputBarHandle, Props>(({
   mdOpen,
   onMdToggle,
   onMdClose,
+  checklistsOpen,
+  onChecklistsToggle,
+  onChecklistsClose,
+  checklists,
+  activeChecklistId,
+  onSelectChecklist,
+  onAddChecklist,
+  onRemoveChecklist,
+  onRenameChecklist,
+  onAddChecklistItem,
+  onToggleChecklistItem,
+  onRemoveChecklistItem,
 }, ref) => {
   const handlePtyData = useCallback(
     (tabId: string) => {
@@ -73,8 +99,10 @@ const LeftPanel = forwardRef<InputBarHandle, Props>(({
         onReorder={onReorderTabs}
         onToggleNotes={onNotesToggle}
         onToggleMd={onMdToggle}
+        onToggleChecklists={onChecklistsToggle}
         notesOpen={notesOpen}
         mdOpen={mdOpen}
+        checklistsOpen={checklistsOpen}
       />
 
       {/* Terminal area */}
@@ -94,6 +122,20 @@ const LeftPanel = forwardRef<InputBarHandle, Props>(({
             content={notesContent}
             onChange={onNotesChange}
             onClose={onNotesClose}
+          />
+        )}
+        {checklistsOpen && (
+          <ChecklistPanel
+            lists={checklists}
+            activeListId={activeChecklistId}
+            onSelectList={onSelectChecklist}
+            onAddList={onAddChecklist}
+            onRemoveList={onRemoveChecklist}
+            onRenameList={onRenameChecklist}
+            onAddItem={onAddChecklistItem}
+            onToggleItem={onToggleChecklistItem}
+            onRemoveItem={onRemoveChecklistItem}
+            onClose={onChecklistsClose}
           />
         )}
         {mdOpen && <MarkdownPanel activeTabId={activeTabId} onClose={onMdClose} />}

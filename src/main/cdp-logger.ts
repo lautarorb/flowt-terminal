@@ -41,7 +41,7 @@ export class CdpLogger {
         const args = params.args?.map((a: { value?: string; description?: string }) => a.value ?? a.description ?? '').join(' ') || '';
         entry = {
           id: `log-${++logIdCounter}`,
-          type: params.type === 'error' ? 'error' : params.type === 'warning' ? 'warn' : params.type === 'info' ? 'info' : 'log',
+          type: params.type === 'error' ? 'error' : params.type === 'warning' ? 'warn' : params.type === 'info' ? 'info' : params.type === 'debug' ? 'debug' : 'log',
           message: args,
           timestamp: Date.now(),
         };

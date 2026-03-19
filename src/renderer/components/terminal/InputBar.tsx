@@ -260,6 +260,7 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
               key={i}
               src={src}
               onRemove={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
+              onUpdate={(dataUrl) => setAttachments((prev) => prev.map((s, j) => j === i ? dataUrl : s))}
             />
           ))}
         </div>

@@ -13,6 +13,8 @@ const TYPE_COLORS: Record<string, string> = {
   'network-request': 'var(--accent-cyan)',
   'network-response': 'var(--accent-green)',
   'network-error': 'var(--accent-red)',
+  debug: 'var(--text-muted)',
+  verbose: 'var(--text-muted)',
 };
 
 export default function LogEntryRow({ entry }: Props) {
@@ -37,6 +39,8 @@ export default function LogEntryRow({ entry }: Props) {
             ? '!'
             : entry.type.startsWith('network')
             ? '→'
+            : entry.type === 'verbose'
+            ? '⋯'
             : '·'}
         </span>
         <span

@@ -15,7 +15,7 @@ export interface DevicePreset {
 
 export interface LogEntry {
   id: string;
-  type: 'log' | 'warn' | 'error' | 'info' | 'network-request' | 'network-response' | 'network-error';
+  type: 'log' | 'warn' | 'error' | 'info' | 'debug' | 'network-request' | 'network-response' | 'network-error' | 'verbose';
   message: string;
   timestamp: number;
   stackTrace?: string;

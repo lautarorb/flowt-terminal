@@ -11,8 +11,10 @@ interface Props {
   onReorder: (fromIndex: number, toIndex: number) => void;
   onToggleNotes: () => void;
   onToggleMd: () => void;
+  onToggleChecklists: () => void;
   notesOpen: boolean;
   mdOpen: boolean;
+  checklistsOpen: boolean;
 }
 
 export default function TerminalTabs({
@@ -25,8 +27,10 @@ export default function TerminalTabs({
   onReorder,
   onToggleNotes,
   onToggleMd,
+  onToggleChecklists,
   notesOpen,
   mdOpen,
+  checklistsOpen,
 }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -260,6 +264,20 @@ export default function TerminalTabs({
           onMouseLeave={(e) => { if (!mdOpen) e.currentTarget.style.background = 'transparent'; }}
         >
           MDs
+        </button>
+        <button
+          onClick={onToggleChecklists}
+          style={{
+            padding: '4px 8px',
+            borderRadius: 6,
+            fontSize: 'var(--font-size-sm)',
+            color: checklistsOpen ? 'var(--accent-yellow)' : 'var(--text-muted)',
+            background: checklistsOpen ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+          }}
+          onMouseEnter={(e) => { if (!checklistsOpen) e.currentTarget.style.background = 'var(--bg-tertiary)'; }}
+          onMouseLeave={(e) => { if (!checklistsOpen) e.currentTarget.style.background = 'transparent'; }}
+        >
+          Checklists
         </button>
         <button
           onClick={onToggleNotes}

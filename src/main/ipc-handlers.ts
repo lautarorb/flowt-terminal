@@ -11,6 +11,17 @@ import { DevicePreset, PreviewBounds } from '../shared/types';
 import Store from 'electron-store';
 
 const store = new Store() as any;
+let verboseIdCounter = 0;
+
+function emitVerbose(window: BrowserWindow, message: string): void {
+  if (window.isDestroyed()) return;
+  window.webContents.send(IPC.LOG_ENTRY, {
+    id: `verbose-${++verboseIdCounter}`,
+    type: 'verbose',
+    message,
+    timestamp: Date.now(),
+  });
+}
 
 export function registerIpcHandlers(
   window: BrowserWindow,
@@ -22,6 +33,7 @@ export function registerIpcHandlers(
 ): void {
   // PTY
   ipcMain.handle(IPC.PTY_CREATE, (_event, tabId: string, cwd?: string) => {
+    emitVerbose(window, `PTY created: ${tabId} (cwd: ${cwd || 'default'})`);
     return ptyManager.create(tabId, cwd);
   });
 
@@ -34,6 +46,7 @@ export function registerIpcHandlers(
   });
 
   ipcMain.on(IPC.PTY_DESTROY, (_event, tabId: string) => {
+    emitVerbose(window, `PTY destroyed: ${tabId}`);
     ptyManager.destroy(tabId);
   });
 
@@ -52,24 +65,33 @@ export function registerIpcHandlers(
 
   ipcMain.handle(IPC.PREVIEW_NAVIGATE, (_event, url: string) => {
     if (!previewManager.getView()) {
+      emitVerbose(window, `Preview: creating WebContentsView`);
       previewManager.create();
-      // Attach CDP in background — don't block navigation
-      cdpLogger.attach().catch(() => {});
+      emitVerbose(window, `Preview: attaching CDP logger (background)`);
+      cdpLogger.attach().then(() => {
+        emitVerbose(window, `Preview: CDP attached`);
+      }).catch(() => {
+        emitVerbose(window, `Preview: CDP attach failed`);
+      });
     }
+    emitVerbose(window, `Preview: navigating to ${url}`);
     previewManager.navigate(url);
   });
 
   ipcMain.on(IPC.PREVIEW_GO_BACK, () => {
+    emitVerbose(window, `Preview: go back`);
     const view = previewManager.getView();
     if (view?.webContents.canGoBack()) view.webContents.goBack();
   });
 
   ipcMain.on(IPC.PREVIEW_RELOAD, () => {
+    emitVerbose(window, `Preview: reload`);
     const view = previewManager.getView();
     view?.webContents.reload();
   });
 
   ipcMain.on(IPC.PREVIEW_SET_DEVICE, (_event, preset: DevicePreset | null) => {
+    emitVerbose(window, `Preview: device ${preset ? preset.name + ' (' + preset.width + 'x' + preset.height + ')' : 'responsive'}`);
     previewManager.setDeviceEmulation(preset);
   });
 
@@ -81,6 +103,15 @@ export function registerIpcHandlers(
   // Notes
   ipcMain.handle(IPC.NOTES_LOAD, () => {
     return store.get('notes', '') as string;
+  });
+
+  // Checklists
+  ipcMain.handle(IPC.CHECKLISTS_LOAD, () => {
+    return store.get('checklists', '[]') as string;
+  });
+
+  ipcMain.on(IPC.CHECKLISTS_SAVE, (_event, data: string) => {
+    store.set('checklists', data);
   });
 
   ipcMain.on(IPC.NOTES_SAVE, (_event, content: string) => {
@@ -116,6 +147,7 @@ export function registerIpcHandlers(
   });
 
   ipcMain.handle(IPC.PREVIEW_CAPTURE, async () => {
+    emitVerbose(window, `Preview: capturing screenshot`);
     const view = previewManager.getView();
     if (!view) return null;
     const image = await view.webContents.capturePage();
@@ -142,11 +174,13 @@ export function registerIpcHandlers(
 
     const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
     await fs.promises.writeFile(filePath, Buffer.from(base64Data, 'base64'));
+    emitVerbose(window, `Screenshot saved: ${filePath}`);
     return filePath;
   });
 
   // Claude webview
   ipcMain.on(IPC.CLAUDE_SHOW, (_event, bounds: PreviewBounds) => {
+    emitVerbose(window, `Claude: show (${bounds.width}x${bounds.height})`);
     claudeView.show(bounds);
   });
 

@@ -22,4 +22,4 @@ export type TabAction =
   | { type: 'SET_ACTIVITY'; id: string; hasActivity: boolean }
   | { type: 'REORDER_TABS'; fromIndex: number; toIndex: number };
 
-export type LogFilter = 'all' | 'errors' | 'network' | 'console';
+export type LogFilter = 'all' | 'errors' | 'network' | 'console' | 'verbose';

@@ -3,7 +3,7 @@ import { LogFilter as LogFilterType } from '../../lib/types';
 interface Props {
   active: LogFilterType;
   onChange: (filter: LogFilterType) => void;
-  counts: { all: number; errors: number; network: number; console: number };
+  counts: { all: number; errors: number; network: number; console: number; verbose: number };
 }
 
 const FILTERS: { key: LogFilterType; label: string }[] = [
@@ -11,6 +11,7 @@ const FILTERS: { key: LogFilterType; label: string }[] = [
   { key: 'errors', label: 'Errors' },
   { key: 'network', label: 'Network' },
   { key: 'console', label: 'Console' },
+  { key: 'verbose', label: 'Verbose' },
 ];
 
 export default function LogFilterBar({ active, onChange, counts }: Props) {
