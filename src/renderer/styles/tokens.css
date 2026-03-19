@@ -1,0 +1,24 @@
+:root {
+  --bg-primary: #0A0A0A;
+  --bg-secondary: #0F0F0F;
+  --bg-tertiary: #1F1F1F;
+  --border: #2a2a2a;
+  --text-primary: #FAFAFA;
+  --text-secondary: #6B7280;
+  --text-muted: #4B5563;
+  --accent-green: #10B981;
+  --accent-yellow: #F59E0B;
+  --accent-red: #EF4444;
+  --accent-cyan: #06B6D4;
+
+  --font-mono: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  --font-size-terminal: 13px;
+  --font-size-ui: 12px;
+  --font-size-sm: 11px;
+  --line-height-terminal: 1.8;
+
+  --tab-height: 40px;
+  --input-height: 48px;
+  --url-bar-height: 36px;
+  --log-max-height: 200px;
+}

@@ -1,0 +1,18 @@
+/* JetBrains Mono — loaded from system or fallback to monospace */
+/* If woff2 files are placed in assets/fonts/, uncomment and update paths:
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../../../assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../../../assets/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+*/
