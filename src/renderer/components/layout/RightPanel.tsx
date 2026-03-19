@@ -5,6 +5,7 @@ import { LogFilter } from '../../lib/types';
 import UrlBar from '../preview/UrlBar';
 import PreviewFrame from '../preview/PreviewFrame';
 import LogDrawer from '../logger/LogDrawer';
+import AttachLogsModal from '../logger/AttachLogsModal';
 
 type RightTab = 'preview' | 'claude';
 
@@ -45,6 +46,7 @@ export default function RightPanel({
 }: Props) {
   const [activeTab, setActiveTab] = useState<RightTab>('preview');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [logsModalOpen, setLogsModalOpen] = useState(false);
   const claudeFrameRef = useRef<HTMLDivElement>(null);
 
   // The preview WebContentsView should be hidden when:
@@ -211,16 +213,7 @@ export default function RightPanel({
           }}
         >
           <button
-            onClick={() => {
-              const text = allLogs
-                .map((l) => {
-                  let line = `[${l.type}] ${l.message}`;
-                  if (l.stackTrace) line += '\n  ' + l.stackTrace;
-                  return line;
-                })
-                .join('\n');
-              onAttachLogs(text);
-            }}
+            onClick={() => setLogsModalOpen(true)}
             style={{
               flex: 1,
               padding: '0 12px',
@@ -278,6 +271,18 @@ export default function RightPanel({
           background: 'var(--bg-primary)',
         }}
       />
+
+      {/* Attach logs modal */}
+      {logsModalOpen && (
+        <AttachLogsModal
+          logs={allLogs.filter((l) => l.type !== 'verbose')}
+          onAttach={(text) => {
+            onAttachLogs(text);
+            setLogsModalOpen(false);
+          }}
+          onCancel={() => setLogsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

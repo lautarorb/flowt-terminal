@@ -1,7 +1,10 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerRpm } from '@electron-forge/maker-rpm';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
@@ -13,13 +16,30 @@ import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
-    asar: true,
+    asar: {
+      unpack: '**/node_modules/{node-pty,nan}/**',
+    },
     icon: './assets/icons/icon',
   },
   rebuildConfig: {},
+  hooks: {
+    packageAfterCopy: async (_config, buildPath) => {
+      // Copy node-pty native module into the packaged app's node_modules
+      // so the webpack external `require('node-pty')` resolves at runtime
+      const src = path.resolve(__dirname, 'node_modules', 'node-pty');
+      const dest = path.join(buildPath, 'node_modules', 'node-pty');
+      if (fs.existsSync(src)) {
+        fs.cpSync(src, dest, { recursive: true });
+      }
+    },
+  },
   makers: [
     new MakerSquirrel({}),
     new MakerZIP({}, ['darwin']),
+    new MakerDMG({
+      format: 'ULFO',
+      icon: './assets/icons/icon.icns',
+    }),
     new MakerRpm({}),
     new MakerDeb({}),
   ],
