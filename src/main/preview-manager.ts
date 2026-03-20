@@ -129,8 +129,11 @@ export class PreviewManager {
         deviceScaleFactor: this.currentDevice.deviceScaleFactor,
         scale,
       });
+      this.view.webContents.invalidate();
     } else {
       this.view.setBounds(container);
+      // Force Chromium to recalculate viewport after resize — fixes scroll breakage
+      this.view.webContents.invalidate();
     }
   }
 

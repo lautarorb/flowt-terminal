@@ -90,6 +90,11 @@ const vibeAPI = {
     onCloseTab: (cb: () => void) => on('menu:close-tab', () => cb()),
   },
 
+  terminal: {
+    onZoom: (cb: (direction: string) => void) => on('terminal:zoom', (_e: any, dir: string) => cb(dir)),
+    onSearch: (cb: () => void) => on('terminal:search', () => cb()),
+  },
+
   window: {
     onFullscreenChanged: (cb: (isFullscreen: boolean) => void) =>
       on('fullscreen-changed', (_e: any, isFullscreen: boolean) => cb(isFullscreen)),

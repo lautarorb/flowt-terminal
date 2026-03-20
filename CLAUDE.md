@@ -8,7 +8,7 @@ Mac-only Electron terminal emulator purpose-built for Claude Code workflows.
 npm install
 npm start        # Dev mode
 npm test         # Run unit tests
-npm run package  # Build for distribution
+npm run make     # Build DMG for distribution
 ```
 
 ## Architecture
@@ -22,7 +22,8 @@ npm run package  # Build for distribution
 ## Key Patterns
 
 - `node-pty` is externalized in webpack (`webpack.main.config.ts`) — it can't be bundled
-- `WebContentsView` renders ABOVE all DOM content — floating panels (Notes, MDs) anchor to the left panel to avoid z-order conflicts
+- `node-pty` is copied into the packaged app via `packageAfterCopy` hook in `forge.config.ts` and unpacked from ASAR for native binary access
+- `WebContentsView` renders ABOVE all DOM content — floating panels (Notes, Checklists, MDs) anchor to the left panel to avoid z-order conflicts
 - The device selector temporarily hides the WebContentsView when its dropdown is open
 - xterm.js `Terminal.open()` can only be called once — tabs use CSS `display: none/block`, not mount/unmount
 - `fix-path` is called at startup to inherit the user's $PATH (Electron GUI apps get minimal PATH)
@@ -33,6 +34,11 @@ npm run package  # Build for distribution
 - URLs default to `https://` when no protocol is specified
 - Preview footer height is owned by LogDrawer — SplitLayout passes 0 to avoid overriding it
 - Initial fullscreen state is sent on `did-finish-load` to ensure correct logo visibility
+- CSP meta tag suppresses Electron security warnings in dev mode
+- Cmd+F opens terminal search bar, Cmd+/- zooms terminal font only (not entire UI), Cmd+0 resets
+- Startup checks for Full Disk Access and prompts user to grant it if missing
+- PTY spawns as login shell (`--login`) with cleaned env (strips ELECTRON_* vars)
+- `fit()` preserves scroll position when user is scrolled up reading history
 
 ## Project Structure
 
@@ -42,29 +48,38 @@ src/
 │   ├── index.ts         # App entry, window creation, fullscreen events
 │   ├── pty-manager.ts   # PTY spawning, I/O, CWD detection via lsof
 │   ├── preview-manager.ts # WebContentsView positioning, device emulation
-│   ├── cdp-logger.ts    # Chrome DevTools Protocol logging
+│   ├── cdp-logger.ts    # Chrome DevTools Protocol logging (incl. console.debug)
 │   ├── claude-view.ts   # Claude.ai floating WebContentsView
 │   ├── file-watcher.ts  # Markdown file discovery via chokidar
 │   ├── prompt-detector.ts # y/n and choice detection in PTY output
 │   ├── port-detector.ts # Dev server URL detection (Next, Vite, Express, etc.)
 │   ├── route-tracker.ts # Framework route file detection
-│   ├── ipc-handlers.ts  # All IPC channel handlers
+│   ├── ipc-handlers.ts  # All IPC channel handlers + verbose logging
 │   └── menu.ts          # macOS menu with Cmd+T/Cmd+W shortcuts
 ├── renderer/            # React UI
 │   ├── App.tsx          # Root component, hook coordination, keyboard shortcuts
-│   ├── hooks/           # useTerminal, useTabs, usePreview, useNotes, useLogs
+│   ├── hooks/           # useTerminal (search, zoom), useTabs, usePreview, useNotes, useLogs, useChecklists
 │   ├── components/
 │   │   ├── layout/      # SplitLayout, LeftPanel, RightPanel
 │   │   ├── terminal/    # TerminalView, TerminalTabs, InputBar, QuickResponse
 │   │   ├── preview/     # PreviewFrame, UrlBar, DeviceSelector, device-presets
-│   │   ├── logger/      # LogDrawer, LogFilter, LogEntry
-│   │   ├── panels/      # NotesPanel, MarkdownPanel, MarkdownFileRow
-│   │   └── shared/      # ActionButton, AttachmentThumb
+│   │   ├── logger/      # LogDrawer, LogFilter, LogEntry, AttachLogsModal
+│   │   ├── panels/      # NotesPanel, MarkdownPanel, MarkdownFileRow, ChecklistPanel
+│   │   └── shared/      # ActionButton, AttachmentThumb, ImageAnnotator
 │   ├── lib/types.ts     # TabState, TabAction, LogFilter, InputMode
 │   └── styles/          # tokens.css, global.css, fonts.css
-├── shared/              # IPC channels (36 channels) + types (11 interfaces)
-└── preload/             # contextBridge API (20+ methods across 8 namespaces)
+├── shared/              # IPC channels (38 channels) + types (11 interfaces)
+└── preload/             # contextBridge API (22+ methods across 9 namespaces)
 ```
+
+## Building & Distribution
+
+```bash
+npm run make                                    # Build all targets
+npm run make -- --targets @electron-forge/maker-dmg  # DMG only
+```
+
+DMG output: `out/make/VibeTerminal-VERSION-arm64.dmg`
 
 ## Testing
 

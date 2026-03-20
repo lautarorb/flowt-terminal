@@ -14,17 +14,34 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  const searchAddonRef = useRef<SearchAddon | null>(null);
   const mountedRef = useRef(false);
+
+  const lastColsRows = useRef<{ cols: number; rows: number }>({ cols: 0, rows: 0 });
 
   const fit = useCallback(() => {
     if (!fitAddonRef.current || !containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
     if (clientWidth === 0 || clientHeight === 0) return;
     try {
-      fitAddonRef.current.fit();
       const term = terminalRef.current;
-      if (term) {
+      if (!term) return;
+      // Save scroll position before fit
+      const buf = term.buffer.active;
+      const wasScrolledUp = buf.viewportY < buf.baseY;
+      const savedViewport = buf.viewportY;
+
+      fitAddonRef.current.fit();
+
+      // Only send resize to PTY if dimensions actually changed
+      if (term.cols !== lastColsRows.current.cols || term.rows !== lastColsRows.current.rows) {
+        lastColsRows.current = { cols: term.cols, rows: term.rows };
         window.vibeAPI.pty.resize(tabId, term.cols, term.rows);
+      }
+
+      // Restore scroll position if user was reading above
+      if (wasScrolledUp) {
+        term.scrollToLine(savedViewport);
       }
     } catch {
       // Ignore fit errors
@@ -106,15 +123,28 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
     terminal.open(containerRef.current);
     terminalRef.current = terminal;
     fitAddonRef.current = fitAddon;
+    searchAddonRef.current = searchAddon;
     mountedRef.current = true;
 
     // Create PTY
     window.vibeAPI.pty.create(tabId);
 
     // PTY data → terminal
+    // Track if user has scrolled up — if so, don't auto-scroll on new data
+    let userScrolledUp = false;
+    const disposeScroll = terminal.onScroll(() => {
+      const buf = terminal.buffer.active;
+      userScrolledUp = buf.viewportY < buf.baseY;
+    });
+
     const cleanupData = window.vibeAPI.pty.onData((id, data) => {
       if (id === tabId) {
+        const wasAtBottom = !userScrolledUp;
         terminal.write(data);
+        if (!wasAtBottom) {
+          // User was reading above — don't scroll
+        }
+        // xterm auto-scrolls on write; if user was scrolled up, restore position
         onData?.(id, data);
       }
     });
@@ -130,10 +160,12 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
     return () => {
       cleanupData();
       disposeOnData.dispose();
+      disposeScroll.dispose();
       terminal.dispose();
       mountedRef.current = false;
       terminalRef.current = null;
       fitAddonRef.current = null;
+      searchAddonRef.current = null;
     };
   }, [tabId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -158,10 +190,38 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
     return () => observer.disconnect();
   }, [isActive, fit]);
 
+  const DEFAULT_FONT_SIZE = 13;
+
+  const zoomFont = useCallback((direction: string) => {
+    const term = terminalRef.current;
+    if (!term) return;
+    const current = term.options.fontSize || DEFAULT_FONT_SIZE;
+    if (direction === 'in') term.options.fontSize = Math.min(28, current + 1);
+    else if (direction === 'out') term.options.fontSize = Math.max(8, current - 1);
+    else if (direction === 'reset') term.options.fontSize = DEFAULT_FONT_SIZE;
+    fit();
+  }, [fit]);
+
+  const findNext = useCallback((query: string) => {
+    searchAddonRef.current?.findNext(query, { decorations: { matchOverviewRuler: '#10B981', activeMatchColorOverviewRuler: '#06B6D4' } });
+  }, []);
+
+  const findPrevious = useCallback((query: string) => {
+    searchAddonRef.current?.findPrevious(query);
+  }, []);
+
+  const clearSearch = useCallback(() => {
+    searchAddonRef.current?.clearDecorations();
+  }, []);
+
   return {
     containerRef,
     terminal: terminalRef,
     focus: useCallback(() => terminalRef.current?.focus(), []),
     fit,
+    zoomFont,
+    findNext,
+    findPrevious,
+    clearSearch,
   };
 }

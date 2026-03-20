@@ -42,6 +42,10 @@ You can also click directly into the terminal area to type into Claude Code's na
 
 Ctrl+C always sends SIGINT to the terminal regardless of where your focus is. Arrow up in an empty input recalls previous messages from history.
 
+Cmd+F opens a search bar in the terminal to find text in the scrollback buffer. Enter finds next, Shift+Enter finds previous, Escape closes the search.
+
+Cmd+ and Cmd- change the terminal font size only (8px min, 28px max) without affecting the rest of the UI. Cmd+0 resets to the default 13px.
+
 ## Screenshot Attach
 
 The "Add screenshot" button on the right panel captures the current state of the preview browser and adds it as an image thumbnail in the chat input bar. You can review it before sending. Screenshots are saved to a `.vibeterminal/` folder inside your project directory so Claude Code can access the file directly.
@@ -56,12 +60,14 @@ The "Add logs" button takes the current browser log panel contents and attaches 
 
 Because the preview panel is an embedded Chromium instance, the app has full programmatic access to everything happening inside it via the Chrome DevTools Protocol. The log drawer captures:
 
-- **Console output**: every console.log, console.error, console.warn, console.info
+- **Console output**: every console.log, console.error, console.warn, console.info, console.debug
 - **Network requests**: every fetch and XHR call, including URL, method, and status code
 - **JavaScript errors**: uncaught exceptions with full stack traces
 - **Network failures**: failed requests with error details
 
-All of this streams into the log drawer in real time, structured and filterable by type: Errors only, Network only, Console only, or All. A trash icon clears the log panel (turns dark red on hover). The log drawer is resizable by dragging its top edge. ERR_ABORTED errors from redirects are silently ignored.
+All of this streams into the log drawer in real time. The drawer has two tabs: **Browser** (logs from the preview site) and **App** (VibeTerminal's internal verbose logs). The Browser tab has sub-filters: All, Errors, Network, Console, and Verbose (console.debug). A trash icon clears the log panel (turns dark red on hover). The log drawer is resizable by dragging its top edge. ERR_ABORTED errors from redirects are silently ignored.
+
+Clicking "Add logs" opens a modal where you choose the log type, record count (All/Last 25/Last 100), and optionally save your selection for next time. Only browser logs are attached — never internal app logs.
 
 ## Quick Response
 
@@ -69,7 +75,15 @@ When Claude Code presents interactive prompts (y/n, numbered choices, Allow?), c
 
 ## Notes Panel
 
-A floating panel accessible from the "Notes" button in the tab bar. It is a simple scratchpad with syntax-highlighted keywords: `todo:` appears in green, `questions:` in yellow, and `api keys:` in cyan. Notes persist across sessions automatically via electron-store.
+A floating panel accessible from the "Notes" button in the tab bar. It is a scratchpad with syntax-highlighted keywords: `todo:` appears in green, `questions:` in yellow, and `api keys:` in cyan. A formatting toolbar offers Bold (**text**), Heading (#/##/###), Bullet list (-), and Numbered list (1.) with auto-continuation on Enter. Notes persist across sessions automatically via electron-store.
+
+## Checklists Panel
+
+A floating panel accessible from the "Checklists" button in the tab bar (between MDs and Notes). Supports multiple named checklists via tabs — double-click a tab to rename it. Add items via the input at the bottom, check them off with a click, and use "Clear done" to remove completed items. Checklists persist across sessions.
+
+## Image Annotation
+
+When you click a screenshot thumbnail in the input bar, a freehand drawing overlay opens. Choose from 5 colors (red, green, yellow, cyan, white) and draw directly on the image. Save composites your drawings onto the original image before sending to Claude Code.
 
 ## Markdown Files Panel
 
@@ -81,4 +95,4 @@ Vibe Terminal does not call the Anthropic API. It does not suggest commands, aut
 
 ## Platform and Stack
 
-Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 36 IPC channels across 8 namespaces. 48 unit tests covering port detection and route tracking.
+Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 38 IPC channels across 9 namespaces. 48 unit tests covering port detection and route tracking. Distributable as a macOS DMG installer.

@@ -1,4 +1,5 @@
-import { app, BrowserWindow, nativeImage } from 'electron';
+import { app, BrowserWindow, nativeImage, dialog, shell } from 'electron';
+import * as fs from 'fs';
 import * as path from 'path';
 import { registerIpcHandlers } from './ipc-handlers';
 import { PtyManager } from './pty-manager';
@@ -98,6 +99,24 @@ app.on('ready', async () => {
     }
   } catch {
     // Icon not found in dev mode, that's ok
+  }
+
+  // Check for Full Disk Access — needed so CLI tools can access Desktop, Documents, etc.
+  const testPath = path.join(app.getPath('home'), 'Desktop');
+  try {
+    fs.readdirSync(testPath);
+  } catch {
+    const result = dialog.showMessageBoxSync({
+      type: 'warning',
+      title: 'Full Disk Access Required',
+      message: 'VibeTerminal needs Full Disk Access to let CLI tools (like Claude Code) access your project folders.',
+      detail: 'Go to System Settings → Privacy & Security → Full Disk Access and enable VibeTerminal.',
+      buttons: ['Open System Settings', 'Continue Anyway'],
+      defaultId: 0,
+    });
+    if (result === 0) {
+      shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles');
+    }
   }
 
   createWindow();

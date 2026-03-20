@@ -123,6 +123,81 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 | electron-store | Persist notes across sessions |
 | chokidar | Watch .md files for live updates |
 | marked | Render markdown in the MDs panel |
+| @electron-forge/maker-dmg | Build macOS DMG installer |
+
+### Image Annotator
+- Freehand drawing overlay on screenshot attachments before sending
+- Canvas-based: mouse events on a transparent canvas overlaying the image
+- 5 predefined colors: red (#EF4444), green (#10B981), yellow (#F59E0B), cyan (#06B6D4), white (#FFFFFF)
+- Stroke width scales with image resolution (`canvasWidth / 200`, min 3px)
+- Save composites original image + drawings into a single PNG dataURL that replaces the attachment
+- Image has `pointer-events: none` and `draggable={false}` to prevent browser drag interference
+
+### Checklists Panel
+- Tabbed checklist system accessible from "Checklists" button in the terminal tab bar
+- Multiple named checklists with add/remove/rename (double-click tab to rename)
+- Items: add via input at bottom, toggle with checkbox, remove on hover × button
+- "Clear done" button appears when any items are checked
+- Persisted via electron-store under dedicated `checklists` key (separate from notes)
+- Checkboxes styled: transparent background, gray border, green SVG checkmark when done
+- Mutual exclusion: opening Checklists closes Notes and MDs panels
+
+### Notes Formatting
+- Toolbar in notes header: Bold (**), Heading (#/##/###), Bullet (-), Numbered (1.)
+- Auto-continuation on Enter: pressing Enter on a `- ` or `1. ` line auto-inserts the next prefix
+- Empty list item on Enter removes the prefix (exits list mode)
+- Heading cycles: # → ## → ### → plain text
+- Overlay highlights: `**bold**` renders bold, `# headings` render bold + larger font
+
+### Attach Logs Modal
+- Clicking "Add logs" opens a modal instead of directly attaching all logs
+- Log type filter: All, Errors, Network, Console, Verbose (with icons)
+- Record count: All records, Last 25, Last 100
+- "Always remember my selection" checkbox persisted to localStorage
+- Only browser logs included — app verbose logs are excluded at the source
+- Dynamic button text: "Attach N logs" shows the count
+
+### Log Drawer Tabs
+- Split into Browser and App tabs
+- Browser tab: preview site logs with All/Errors/Network/Console/Verbose filters on separate row
+- App tab: VibeTerminal internal verbose logs (PTY, preview, CDP, screenshots, Claude events)
+- Verbose browser filter shows `console.debug()` calls from the preview site
+- Tabs only visible when drawer is open; closed state shows error count badge
+
+### DMG Packaging
+- `@electron-forge/maker-dmg` with ULFO format
+- `packageAfterCopy` hook copies `node-pty` into packaged app's `node_modules/`
+- ASAR unpack pattern: `**/node_modules/{node-pty,nan}/**` ensures native `.node` binaries are accessible
+- CSP meta tag added to suppress Electron security warnings in dev mode
+
+### Terminal Search
+- Cmd+F opens a search bar floating top-right of the terminal
+- Uses xterm.js SearchAddon for buffer search
+- Enter for next match, Shift+Enter for previous, Escape to close
+- Highlights matches in the terminal buffer
+
+### Terminal Font Zoom
+- Cmd+/Cmd- changes terminal font size only (not the entire UI)
+- Range: 8px to 28px, default 13px
+- Cmd+0 resets to default
+- Overrides Electron's default zoom behavior via custom menu items
+- Automatically refits the terminal after font size change
+
+### Scroll Position Preservation
+- `fit()` saves and restores viewport position when user is scrolled up
+- Prevents jump-to-top during resize while reading history
+- Only sends PTY resize when cols/rows actually change
+
+### Full Disk Access Check
+- On startup, attempts to read ~/Desktop to test file access permissions
+- If denied, shows a dialog explaining the requirement with a button to open System Settings → Privacy & Security → Full Disk Access
+- User can skip with "Continue Anyway" but CLI tools may fail in protected directories
+
+### PTY Environment
+- Spawns as login shell (`--login`) to source user's PATH config
+- Strips `ELECTRON_*`, `CHROME_*`, `GOOGLE_*`, and `NODE_OPTIONS` from env
+- Preserves all other env vars for MCP servers, hooks, and CLI tools
+- Sets `TERM_PROGRAM=VibeTerminal`
 
 ## Known Limitations
 

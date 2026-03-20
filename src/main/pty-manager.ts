@@ -18,16 +18,29 @@ export class PtyManager {
 
   create(tabId: string, cwd?: string): string {
     const shell = process.env.SHELL || '/bin/zsh';
-    const term = pty.spawn(shell, [], {
+
+    // Pass through full env but strip Electron internals that can break CLI tools
+    const cleanEnv: Record<string, string> = {};
+    for (const [key, val] of Object.entries(process.env)) {
+      if (val === undefined) continue;
+      if (key.startsWith('ELECTRON_')) continue;
+      if (key.startsWith('CHROME_') || key === 'ORIGINAL_XDG_CURRENT_DESKTOP') continue;
+      if (key === 'GOOGLE_API_KEY' || key === 'GOOGLE_DEFAULT_CLIENT_ID' || key === 'GOOGLE_DEFAULT_CLIENT_SECRET') continue;
+      if (key === 'NODE_OPTIONS') continue; // Electron may set internal NODE_OPTIONS
+      cleanEnv[key] = val;
+    }
+
+    const term = pty.spawn(shell, ['--login'], {
       name: 'xterm-256color',
       cols: 80,
       rows: 24,
       cwd: cwd || process.env.HOME || '/',
       env: {
-        ...process.env,
+        ...cleanEnv,
         TERM: 'xterm-256color',
         COLORTERM: 'truecolor',
-      } as Record<string, string>,
+        TERM_PROGRAM: 'VibeTerminal',
+      },
     });
 
     term.onData((data: string) => {
