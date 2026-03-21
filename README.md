@@ -125,7 +125,7 @@ Output: `out/make/Flowt-VERSION-arm64.dmg`
 
 Flowt does not call the Anthropic API. It does not suggest commands, autocomplete prompts, or interpret your terminal output. It has zero awareness of your code or conversations. All of that is Claude Code's job.
 
-If you closed Flowt and opened iTerm2, Claude Code would behave identically. Flowt just removes the friction from everything around it.
+If you closed Flowt and opened iTerm2, Claude Code would behave identically. Flowt just removes the friction from everything around it while helping you keep your flow.
 
 ## Requirements
 
