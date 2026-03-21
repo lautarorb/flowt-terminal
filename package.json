@@ -1,6 +1,6 @@
 {
-  "name": "vibeterminal",
-  "productName": "VibeTerminal",
+  "name": "flowt",
+  "productName": "Flowt",
   "version": "0.1.0",
   "description": "A terminal emulator purpose-built for Claude Code workflows",
   "main": ".webpack/main",

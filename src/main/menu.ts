@@ -3,7 +3,7 @@ import { app, BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron';
 export function buildMenu(window: BrowserWindow): void {
   const template: MenuItemConstructorOptions[] = [
     {
-      label: 'VibeTerminal',
+      label: 'Flowt',
       submenu: [
         { role: 'about' },
         { type: 'separator' },

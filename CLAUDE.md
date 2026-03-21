@@ -1,4 +1,4 @@
-# VibeTerminal
+# Flowt
 
 Mac-only Electron terminal emulator purpose-built for Claude Code workflows.
 
@@ -28,7 +28,7 @@ npm run make     # Build DMG for distribution
 - xterm.js `Terminal.open()` can only be called once — tabs use CSS `display: none/block`, not mount/unmount
 - `fix-path` is called at startup to inherit the user's $PATH (Electron GUI apps get minimal PATH)
 - PTY shell CWD is detected via `lsof -a -p PID -d cwd` on macOS
-- Screenshots are saved to `<project>/.vibeterminal/` so Claude Code can access them
+- Screenshots are saved to `<project>/.flowt/` so Claude Code can access them
 - CDP logger attaches in background to avoid blocking first navigation
 - `ERR_ABORTED` from redirects is ignored (not treated as navigation error)
 - URLs default to `https://` when no protocol is specified
@@ -79,7 +79,7 @@ npm run make                                    # Build all targets
 npm run make -- --targets @electron-forge/maker-dmg  # DMG only
 ```
 
-DMG output: `out/make/VibeTerminal-VERSION-arm64.dmg`
+DMG output: `out/make/Flowt-VERSION-arm64.dmg`
 
 ## Testing
 

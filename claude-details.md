@@ -1,4 +1,4 @@
-# VibeTerminal — Design Decisions & Details
+# Flowt — Design Decisions & Details
 
 ## Core Concept
 
@@ -21,7 +21,7 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 ### Input System
 - **Single chat input bar** — compose messages, hit Enter to send to PTY via `\r` (carriage return, not `\n`)
 - **Text attachments** (logs) shown as collapsible blocks above input — expand/collapse for 10+ lines
-- **Image attachments** saved to `<project>/.vibeterminal/screenshot-xxx.png`, file path sent to PTY so Claude Code can read them
+- **Image attachments** saved to `<project>/.flowt/screenshot-xxx.png`, file path sent to PTY so Claude Code can read them
 - **Ctrl+C** always sends SIGINT (`\x03`) regardless of focus
 
 ### Preview (WebContentsView)
@@ -84,9 +84,9 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 - Drag to reorder
 
 ### Screenshots
-- Saved to `<project-cwd>/.vibeterminal/` directory (detected from shell's CWD)
+- Saved to `<project-cwd>/.flowt/` directory (detected from shell's CWD)
 - This keeps them accessible to Claude Code which can read files from the project
-- Add `.vibeterminal` to `.gitignore`
+- Add `.flowt` to `.gitignore`
 
 ### Native Module Handling
 - `node-pty` declared as webpack external (`commonjs node-pty`) in `webpack.main.config.ts`
@@ -160,7 +160,7 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 ### Log Drawer Tabs
 - Split into Browser and App tabs
 - Browser tab: preview site logs with All/Errors/Network/Console/Verbose filters on separate row
-- App tab: VibeTerminal internal verbose logs (PTY, preview, CDP, screenshots, Claude events)
+- App tab: Flowt internal verbose logs (PTY, preview, CDP, screenshots, Claude events)
 - Verbose browser filter shows `console.debug()` calls from the preview site
 - Tabs only visible when drawer is open; closed state shows error count badge
 
@@ -197,7 +197,7 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 - Spawns as login shell (`--login`) to source user's PATH config
 - Strips `ELECTRON_*`, `CHROME_*`, `GOOGLE_*`, and `NODE_OPTIONS` from env
 - Preserves all other env vars for MCP servers, hooks, and CLI tools
-- Sets `TERM_PROGRAM=VibeTerminal`
+- Sets `TERM_PROGRAM=Flowt`
 
 ## Known Limitations
 

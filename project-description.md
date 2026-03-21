@@ -1,6 +1,6 @@
-# Vibe Terminal
+# Flowt
 
-A Mac terminal emulator built for Claude Code workflows. The premise is simple: Claude Code is already a great vibe coding tool, but the terminal interface it lives in was not designed around that workflow. Vibe Terminal is. It adds no intelligence, makes no API calls, and has no opinion about your code. It is purely a better-shaped window for the way a vibe coding session actually runs.
+A Mac terminal emulator built for Claude Code workflows. The premise is simple: Claude Code is already a great vibe coding tool, but the terminal interface it lives in was not designed around that workflow. Flowt is. It adds no intelligence, makes no API calls, and has no opinion about your code. It is purely a better-shaped window for the way a vibe coding session actually runs.
 
 ## Layout
 
@@ -48,7 +48,7 @@ Cmd+ and Cmd- change the terminal font size only (8px min, 28px max) without aff
 
 ## Screenshot Attach
 
-The "Add screenshot" button on the right panel captures the current state of the preview browser and adds it as an image thumbnail in the chat input bar. You can review it before sending. Screenshots are saved to a `.vibeterminal/` folder inside your project directory so Claude Code can access the file directly.
+The "Add screenshot" button on the right panel captures the current state of the preview browser and adds it as an image thumbnail in the chat input bar. You can review it before sending. Screenshots are saved to a `.flowt/` folder inside your project directory so Claude Code can access the file directly.
 
 You can also drag an image file onto the input bar, or paste an image from your clipboard. Images appear as preview thumbnails with a remove button.
 
@@ -65,7 +65,7 @@ Because the preview panel is an embedded Chromium instance, the app has full pro
 - **JavaScript errors**: uncaught exceptions with full stack traces
 - **Network failures**: failed requests with error details
 
-All of this streams into the log drawer in real time. The drawer has two tabs: **Browser** (logs from the preview site) and **App** (VibeTerminal's internal verbose logs). The Browser tab has sub-filters: All, Errors, Network, Console, and Verbose (console.debug). A trash icon clears the log panel (turns dark red on hover). The log drawer is resizable by dragging its top edge. ERR_ABORTED errors from redirects are silently ignored.
+All of this streams into the log drawer in real time. The drawer has two tabs: **Browser** (logs from the preview site) and **App** (Flowt's internal verbose logs). The Browser tab has sub-filters: All, Errors, Network, Console, and Verbose (console.debug). A trash icon clears the log panel (turns dark red on hover). The log drawer is resizable by dragging its top edge. ERR_ABORTED errors from redirects are silently ignored.
 
 Clicking "Add logs" opens a modal where you choose the log type, record count (All/Last 25/Last 100), and optionally save your selection for next time. Only browser logs are attached — never internal app logs.
 
@@ -91,7 +91,7 @@ A floating panel accessible from the "MDs" button in the tab bar. It detects you
 
 ## What It Is Not
 
-Vibe Terminal does not call the Anthropic API. It does not suggest commands, autocomplete prompts, or interpret your terminal output. It has no awareness of what Claude Code is doing or saying. All of that is Claude Code's job. The app is intentionally transparent. If you closed Vibe Terminal and opened iTerm2, Claude Code would behave identically. Vibe Terminal just removes the friction from the surrounding workflow.
+Flowt does not call the Anthropic API. It does not suggest commands, autocomplete prompts, or interpret your terminal output. It has no awareness of what Claude Code is doing or saying. All of that is Claude Code's job. The app is intentionally transparent. If you closed Flowt and opened iTerm2, Claude Code would behave identically. Flowt just removes the friction from the surrounding workflow.
 
 ## Platform and Stack
 

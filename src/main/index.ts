@@ -12,7 +12,7 @@ import { buildMenu } from './menu';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-app.setName('VibeTerminal');
+app.setName('Flowt');
 
 // Fix $PATH for macOS GUI apps
 const fixPath = async () => {
@@ -109,8 +109,8 @@ app.on('ready', async () => {
     const result = dialog.showMessageBoxSync({
       type: 'warning',
       title: 'Full Disk Access Required',
-      message: 'VibeTerminal needs Full Disk Access to let CLI tools (like Claude Code) access your project folders.',
-      detail: 'Go to System Settings → Privacy & Security → Full Disk Access and enable VibeTerminal.',
+      message: 'Flowt needs Full Disk Access to let CLI tools (like Claude Code) access your project folders.',
+      detail: 'Go to System Settings → Privacy & Security → Full Disk Access and enable Flowt.',
       buttons: ['Open System Settings', 'Continue Anyway'],
       defaultId: 0,
     });

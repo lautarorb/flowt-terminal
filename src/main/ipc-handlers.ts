@@ -167,7 +167,7 @@ export function registerIpcHandlers(
       baseDir = app.getPath('temp');
     }
 
-    const screenshotsDir = path.join(baseDir, '.vibeterminal');
+    const screenshotsDir = path.join(baseDir, '.flowt');
     await fs.promises.mkdir(screenshotsDir, { recursive: true });
     const filename = `screenshot-${Date.now()}.png`;
     const filePath = path.join(screenshotsDir, filename);

@@ -96,3 +96,7 @@ out/
 /image.png
 /images/
 *.pen
+*.ttf
+/VibeTerminallogs
+/viveterminalicon.png
+/sunglasses.png

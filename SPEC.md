@@ -1,10 +1,10 @@
-# VibeTerminal — Technical Specification
+# Flowt — Technical Specification
 
 ## 1. System Architecture
 
 ### 1.1 Process Model
 
-VibeTerminal follows Electron's multi-process architecture with strict security boundaries:
+Flowt follows Electron's multi-process architecture with strict security boundaries:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -112,7 +112,7 @@ Managed via `useReducer`. Tab IDs are formatted as `tab-{N}-{timestamp}`. The re
 | Terminal history | Input bar local state | Lost on app restart |
 | Preview URL | React state only | Lost on app restart |
 | Log entries | React state (max 500) | Lost on app restart |
-| Screenshots | Filesystem (`<project>/.vibeterminal/`) | Persists until deleted |
+| Screenshots | Filesystem (`<project>/.flowt/`) | Persists until deleted |
 
 ### 2.4 IPC Communication Patterns
 
@@ -170,7 +170,7 @@ All renderer-side listeners return an unsubscribe function for cleanup in `useEf
 **App (3 channels)**:
 - `app:get-cwd` — invoke: get shell CWD via lsof
 - `app:capture-page` — invoke: screenshot of entire app window
-- `app:save-temp-image` — invoke: save base64 image to .vibeterminal/
+- `app:save-temp-image` — invoke: save base64 image to .flowt/
 
 **Claude (4 channels)**:
 - `claude:show` — send: show Claude view with bounds
@@ -395,7 +395,7 @@ Log.enable      → browser-level log entries
 3. Returns base64 dataURL
 4. inputBarRef.addImage(dataUrl) → thumbnail appears in InputBar
 5. User types message, hits Enter
-6. IPC APP_SAVE_TEMP_IMAGE → saves PNG to <project>/.vibeterminal/screenshot-xxx.png
+6. IPC APP_SAVE_TEMP_IMAGE → saves PNG to <project>/.flowt/screenshot-xxx.png
 7. File path appended to message text
 8. Full text written to PTY via PTY_WRITE, then \r after 500ms delay
 9. Claude Code receives message + file path, reads the image

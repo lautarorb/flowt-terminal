@@ -39,7 +39,7 @@ export class PtyManager {
         ...cleanEnv,
         TERM: 'xterm-256color',
         COLORTERM: 'truecolor',
-        TERM_PROGRAM: 'VibeTerminal',
+        TERM_PROGRAM: 'Flowt',
       },
     });
 

@@ -26,10 +26,10 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
     try {
       const term = terminalRef.current;
       if (!term) return;
-      // Save scroll position before fit
+      // Save scroll distance from bottom before fit
       const buf = term.buffer.active;
       const wasScrolledUp = buf.viewportY < buf.baseY;
-      const savedViewport = buf.viewportY;
+      const distFromBottom = buf.baseY - buf.viewportY;
 
       fitAddonRef.current.fit();
 
@@ -40,8 +40,10 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
       }
 
       // Restore scroll position if user was reading above
-      if (wasScrolledUp) {
-        term.scrollToLine(savedViewport);
+      if (wasScrolledUp && distFromBottom > 0) {
+        const newBuf = term.buffer.active;
+        const targetLine = Math.max(0, newBuf.baseY - distFromBottom);
+        term.scrollToLine(targetLine);
       }
     } catch {
       // Ignore fit errors
