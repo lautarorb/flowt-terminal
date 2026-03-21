@@ -139,7 +139,7 @@ MIT
 
 ## Author
 
-Lautaro Rodriguez Barreiro
+[lautarorb](https://github.com/lautarorb)
 
 ## Disclaimer
 
