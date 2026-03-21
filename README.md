@@ -139,7 +139,7 @@ MIT
 
 ## Author
 
-[Lautaro Rodriguez Barreiro](mailto:)
+Lautaro Rodriguez Barreiro
 
 ## Disclaimer
 
