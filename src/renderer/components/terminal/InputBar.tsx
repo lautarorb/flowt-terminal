@@ -146,8 +146,8 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
   const autoResize = useCallback(() => {
     const ta = chatRef.current;
     if (!ta) return;
-    ta.style.height = '24px';
-    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+    ta.style.height = '48px';
+    ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
   }, []);
 
   const handleKeyDown = useCallback(
@@ -301,8 +301,8 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
             fontSize: 'var(--font-size-terminal)',
             lineHeight: '24px',
             resize: 'none',
-            minHeight: 24,
-            maxHeight: 120,
+            minHeight: 48,
+            maxHeight: 160,
           }}
         />
 
