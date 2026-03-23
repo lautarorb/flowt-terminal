@@ -40,9 +40,13 @@ export default function App() {
         removeTab(activeTabId);
       }
     });
+    const cleanupReload = window.vibeAPI.menu.onReloadPreview(() => {
+      window.vibeAPI.preview.reload();
+    });
     return () => {
       cleanupNew();
       cleanupClose();
+      cleanupReload();
     };
   }, [addTab, removeTab, activeTabId, tabs.length]);
 

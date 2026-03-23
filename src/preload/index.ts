@@ -88,6 +88,7 @@ const vibeAPI = {
   menu: {
     onNewTab: (cb: () => void) => on('menu:new-tab', () => cb()),
     onCloseTab: (cb: () => void) => on('menu:close-tab', () => cb()),
+    onReloadPreview: (cb: () => void) => on('preview:reload-from-menu', () => cb()),
   },
 
   terminal: {

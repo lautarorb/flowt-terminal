@@ -56,8 +56,11 @@ export function buildMenu(window: BrowserWindow): void {
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
+        {
+          label: 'Reload Preview',
+          accelerator: 'Cmd+R',
+          click: () => { if (!window.isDestroyed()) window.webContents.send('preview:reload-from-menu'); },
+        },
         { role: 'toggleDevTools' },
         { type: 'separator' },
         {

@@ -78,6 +78,28 @@ const createWindow = (): void => {
     if (!mainWindow?.isDestroyed()) mainWindow?.webContents.send('fullscreen-changed', false);
   });
 
+  let forceQuit = false;
+
+  app.on('before-quit', () => {
+    forceQuit = true;
+  });
+
+  mainWindow.on('close', (e) => {
+    if (forceQuit) return;
+    e.preventDefault();
+    const choice = dialog.showMessageBoxSync(mainWindow!, {
+      type: 'question',
+      buttons: ['Quit', 'Cancel'],
+      defaultId: 1,
+      title: 'Quit Flowt',
+      message: 'This will terminate all running processes.',
+    });
+    if (choice === 0) {
+      forceQuit = true;
+      mainWindow?.close();
+    }
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
     ptyManager.destroyAll();
@@ -134,6 +156,3 @@ app.on('activate', () => {
   }
 });
 
-app.on('before-quit', () => {
-  ptyManager?.destroyAll();
-});

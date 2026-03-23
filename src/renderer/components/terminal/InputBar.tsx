@@ -272,7 +272,7 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
           alignItems: 'flex-end',
           gap: 8,
           background: 'var(--bg-secondary)',
-          border: '1px solid var(--border)',
+          border: '1px solid var(--text-muted)',
           borderRadius: 8,
           padding: '6px 12px',
         }}
