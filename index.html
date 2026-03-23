@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NM95JHGFRY"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NM95JHGFRY');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>flowt — Stop switching. Start shipping.</title>
+  <meta name="description" content="Designed for vibe coding. See your app update live, attach screenshots, and send logs to Claude — without leaving the terminal.">
+  <meta name="author" content="flowt">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="flowt — Stop switching. Start shipping.">
+  <meta property="og:description" content="Designed for vibe coding. See your app update live, attach screenshots, and send logs to Claude — without leaving the terminal.">
+  <meta property="og:image" content="og-flowt.jpg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="flowt — Stop switching. Start shipping.">
+  <meta name="twitter:description" content="Designed for vibe coding. See your app update live, attach screenshots, and send logs to Claude — without leaving the terminal.">
+  <meta name="twitter:image" content="og-flowt.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0A0A0A;
+      --bg-light: #FAFAFA;
+      --green: #10B981;
+      --green-dim: rgba(16, 185, 129, 0.15);
+      --red: #EF4444;
+      --border: #2a2a2a;
+      --text-light: #FAFAFA;
+      --text-dark: #0A0A0A;
+      --muted: #6B7280;
+      --muted-dark: #4B5563;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ═══════════════ NAV ═══════════════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav-logo {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-light); }
+
+    .nav-cta {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 20px;
+      background: var(--green);
+      color: var(--bg-dark);
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ═══════════════ HERO ═══════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 48px 340px;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 30%, rgba(16, 185, 129, 0.06) 0%, transparent 70%),
+        var(--bg-dark);
+      color: var(--text-light);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      will-change: transform, opacity;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .hero-video-section {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      padding: 0 48px 120px;
+      margin-top: -280px;
+    }
+
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--green);
+      margin-bottom: 40px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 80px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      margin-bottom: 28px;
+      color: var(--text-light);
+      animation: fadeInUp 0.6s ease-out 0.1s both;
+      width: 100%;
+    }
+
+    .hero p {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 56px;
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .hero-mockup {
+      width: min(900px, 85vw);
+      aspect-ratio: 16 / 10;
+      background: var(--bg-dark);
+      border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(16, 185, 129, 0.05);
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .mockup-titlebar {
+      height: 36px;
+      background: #151515;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 7px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .mockup-titlebar-text {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .mockup-dot:nth-child(1) { background: #EF4444; }
+    .mockup-dot:nth-child(2) { background: #F59E0B; }
+    .mockup-dot:nth-child(3) { background: #10B981; }
+
+    .mockup-body {
+      display: flex;
+      height: calc(100% - 36px);
+    }
+
+    .mockup-left {
+      flex: 1.4;
+      padding: 20px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mockup-line {
+      height: 10px;
+      border-radius: 3px;
+      opacity: 0.4;
+    }
+
+    .mockup-line.prompt { background: var(--green); width: 30%; }
+    .mockup-line.text { background: var(--muted); }
+    .mockup-line.w60 { width: 60%; }
+    .mockup-line.w80 { width: 80%; }
+    .mockup-line.w45 { width: 45%; }
+    .mockup-line.w70 { width: 70%; }
+
+    .mockup-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mockup-urlbar {
+      height: 32px;
+      margin: 8px;
+      background: #1F1F1F;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .mockup-urlbar span {
+      font-size: 8px;
+      color: var(--muted);
+    }
+
+    .mockup-preview {
+      flex: 1;
+      margin: 0 8px 8px;
+      background: #FAFAFA;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 20px;
+      gap: 8px;
+    }
+
+    .mockup-preview-line {
+      height: 8px;
+      border-radius: 3px;
+      background: #e0e0e0;
+    }
+
+    .mockup-preview-btn {
+      padding: 6px 20px;
+      background: var(--green);
+      border-radius: 4px;
+      font-size: 8px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      display: inline-block;
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    /* ═══════════════ TICKER ═══════════════ */
+    .ticker {
+      background: var(--green);
+      color: var(--bg-dark);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker 20s linear infinite;
+    }
+
+    .ticker-item {
+      padding: 0 24px;
+    }
+
+    .ticker-item::after {
+      content: '·';
+      margin-left: 24px;
+      opacity: 0.5;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ═══════════════ SECTIONS SHARED ═══════════════ */
+    .section { padding: 120px 48px; }
+    .section-dark { background: #0f0f0f; }
+    .section-light { background: #f0faf5; color: var(--text-dark); }
+
+    .section-label {
+      font-size: 12px;
+      color: var(--green);
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 48px;
+    }
+
+    .section-light .section-subtitle { color: #6B7280; }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ═══════════════ PROBLEM ═══════════════ */
+    .problem-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    .problem-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .problem-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ═══════════════ UNLOCK ═══════════════ */
+    .unlock-section {
+      padding: 120px 0 120px 48px;
+      background: var(--bg-dark);
+      overflow: hidden;
+    }
+
+    .unlock {
+      display: flex;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .unlock-left {
+      flex: 0 0 300px;
+    }
+
+    .unlock-left h2 {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      color: var(--text-light);
+    }
+
+    .unlock-right {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      cursor: grab;
+    }
+
+    .unlock-right::-webkit-scrollbar { display: none; }
+    .unlock-right:active { cursor: grabbing; }
+
+    .unlock-card-item {
+      flex: 0 0 360px;
+      scroll-snap-align: start;
+    }
+
+    .unlock-card-num {
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .unlock-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-light);
+      line-height: 1.35;
+      margin-bottom: 16px;
+    }
+
+    .unlock-card-img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #141414;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .unlock-card-img span {
+      font-size: 11px;
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 5px 14px;
+      border-radius: 4px;
+    }
+
+    .unlock-card-body p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    /* ═══════════════ FEATURES GRID ═══════════════ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+    }
+
+    .feature-card {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0 12px;
+    }
+
+    .feature-card:hover {
+      background: rgba(16, 185, 129, 0.03);
+    }
+
+    .feature-icon {
+      color: var(--green);
+      margin-bottom: 0;
+    }
+
+    .feature-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .feature-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 0;
+      flex: 1;
+    }
+
+    .feature-card p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    /* ═══════════════ PHILOSOPHY ═══════════════ */
+    .philosophy {
+      display: flex;
+      justify-content: center;
+    }
+
+    .philosophy .container {
+      text-align: left;
+      max-width: 700px;
+    }
+
+    .philosophy-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 40px 0;
+    }
+
+    .philosophy-list li {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .philosophy-list li .x {
+      color: var(--red);
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .philosophy-closing {
+      font-size: 12px;
+      color: var(--muted-dark);
+      margin: 32px 0 0;
+      line-height: 1.8;
+    }
+
+    /* ═══════════════ CTA ═══════════════ */
+    .cta {
+      text-align: center;
+      padding: 120px 48px;
+      position: relative;
+    }
+
+    .cta .container { position: relative; z-index: 1; }
+
+    .cta h2 {
+      font-size: clamp(32px, 4.5vw, 60px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .cta p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--green);
+      color: var(--bg-dark);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: transparent;
+      color: var(--text-light);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .cta-meta {
+      font-size: 11px;
+      color: var(--muted-dark);
+    }
+
+    /* ═══════════════ FOOTER ═══════════════ */
+    footer {
+      background: var(--green);
+      color: #FFFFFF;
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand { display: flex; flex-direction: column; gap: 4px; }
+
+    .footer-brand .logo {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .footer-brand .tagline {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    .footer-icon {
+      font-size: 48px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 64px;
+    }
+
+    .footer-col h4 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: lowercase;
+    }
+
+    .footer-col a {
+      display: block;
+      font-size: 11px;
+      opacity: 0.7;
+      margin-bottom: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .footer-col a:hover { opacity: 1; }
+
+    /* ═══════════════ STRIKETHROUGH ═══════════════ */
+    .strikethrough-delay {
+      position: relative;
+      display: inline-block;
+    }
+
+    .strikethrough-delay::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      width: 0;
+      height: 5px;
+      background: #FFFFFF;
+      transition: width 0.4s ease-out 0.6s;
+    }
+
+    .strikethrough-delay.active::after {
+      width: calc(100% + 8px);
+    }
+
+    /* ═══════════════ TYPEWRITER ═══════════════ */
+    .typewriter-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .typewriter-line {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      width: 0;
+      border-right: 3px solid var(--text-light);
+      max-width: 100%;
+    }
+
+    .typewriter-line.line-1 {
+      animation: typewriter 1.3s steps(15) 0.5s 1 normal both,
+                 blinkCursor 500ms infinite 0.5s,
+                 hideCursor 0s 2.3s 1 normal forwards;
+    }
+
+    .typewriter-line.line-2 {
+      border-right-color: transparent;
+      animation: typewriter2 1.3s steps(15) 2.3s 1 normal both,
+                 showCursor 0s 2.3s 1 normal forwards,
+                 blinkCursor 500ms steps(2) 2.3s 6 normal,
+                 hideCursor 0s 5.1s 1 normal forwards;
+    }
+
+    @keyframes hideCursor {
+      to { border-right-color: transparent; }
+    }
+
+    @keyframes showCursor {
+      to { border-right-color: var(--text-light); }
+    }
+
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 8.5em; }
+    }
+
+    @keyframes typewriter2 {
+      from { width: 0; }
+      to { width: 9em; }
+    }
+
+    @keyframes blinkCursor {
+      from { border-right-color: var(--text-light); }
+      to { border-right-color: transparent; }
+    }
+
+    /* ═══════════════ GLITCH ═══════════════ */
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 #EF4444;
+      animation: glitch-1 2s linear infinite alternate-reverse;
+    }
+
+    .glitch::after {
+      left: -2px;
+      text-shadow: -2px 0 #06B6D4;
+      animation: glitch-2 2s linear infinite alternate-reverse;
+    }
+
+    @keyframes glitch-1 {
+      0% { clip: rect(42px, 9999px, 44px, 0); }
+      5% { clip: rect(12px, 9999px, 59px, 0); }
+      10% { clip: rect(96px, 9999px, 125px, 0); }
+      15% { clip: rect(5px, 9999px, 32px, 0); }
+      20% { clip: rect(67px, 9999px, 98px, 0); }
+      25% { clip: rect(133px, 9999px, 148px, 0); }
+      30% { clip: rect(21px, 9999px, 78px, 0); }
+      35% { clip: rect(55px, 9999px, 62px, 0); }
+      40% { clip: rect(108px, 9999px, 142px, 0); }
+      45% { clip: rect(7px, 9999px, 23px, 0); }
+      50% { clip: rect(87px, 9999px, 112px, 0); }
+      55% { clip: rect(34px, 9999px, 51px, 0); }
+      60% { clip: rect(118px, 9999px, 136px, 0); }
+      65% { clip: rect(2px, 9999px, 19px, 0); }
+      70% { clip: rect(75px, 9999px, 93px, 0); }
+      75% { clip: rect(48px, 9999px, 72px, 0); }
+      80% { clip: rect(14px, 9999px, 38px, 0); }
+      85% { clip: rect(91px, 9999px, 127px, 0); }
+      90% { clip: rect(60px, 9999px, 84px, 0); }
+      95% { clip: rect(26px, 9999px, 46px, 0); }
+      100% { clip: rect(103px, 9999px, 115px, 0); }
+    }
+
+    @keyframes glitch-2 {
+      0% { clip: rect(129px, 9999px, 145px, 0); }
+      5% { clip: rect(38px, 9999px, 67px, 0); }
+      10% { clip: rect(8px, 9999px, 25px, 0); }
+      15% { clip: rect(112px, 9999px, 138px, 0); }
+      20% { clip: rect(52px, 9999px, 79px, 0); }
+      25% { clip: rect(18px, 9999px, 41px, 0); }
+      30% { clip: rect(89px, 9999px, 106px, 0); }
+      35% { clip: rect(3px, 9999px, 16px, 0); }
+      40% { clip: rect(71px, 9999px, 95px, 0); }
+      45% { clip: rect(122px, 9999px, 143px, 0); }
+      50% { clip: rect(29px, 9999px, 54px, 0); }
+      55% { clip: rect(83px, 9999px, 101px, 0); }
+      60% { clip: rect(46px, 9999px, 68px, 0); }
+      65% { clip: rect(11px, 9999px, 33px, 0); }
+      70% { clip: rect(136px, 9999px, 150px, 0); }
+      75% { clip: rect(63px, 9999px, 88px, 0); }
+      80% { clip: rect(97px, 9999px, 119px, 0); }
+      85% { clip: rect(22px, 9999px, 47px, 0); }
+      90% { clip: rect(74px, 9999px, 92px, 0); }
+      95% { clip: rect(40px, 9999px, 58px, 0); }
+      100% { clip: rect(5px, 9999px, 28px, 0); }
+    }
+
+    /* ═══════════════ ANIMATIONS ═══════════════ */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════ RESPONSIVE ═══════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .section { padding: 80px 24px; }
+      .problem-cards { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .unlock { flex-direction: column; }
+      .unlock-left { position: static; }
+      footer { flex-direction: column; gap: 32px; text-align: center; }
+      .footer-links { gap: 40px; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .feature-card p { display: none; }
+      .feature-card { cursor: pointer; padding: 20px 24px; position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; }
+      .feature-card .feature-icon { margin-bottom: 0; }
+      .feature-card h3 { flex: 1; margin-bottom: 0; }
+      .feature-card p { width: 100%; margin-top: 12px; }
+      .feature-card.expanded p { display: block; }
+      .feature-card h3::after { content: '+'; float: right; color: var(--muted); font-weight: 400; }
+      .feature-card.expanded h3::after { content: '−'; }
+    }
+
+    /* ═══════════════ STICKY PILL ═══════════════ */
+    .sticky-pill {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .sticky-pill:hover {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+
+    .nav-pill {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .sticky-pill { display: none; }
+      .nav-pill {
+        display: inline-block;
+        padding: 6px 0;
+        background: none;
+        border: none;
+        font-size: 11px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--green);
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+    }
+
+    /* ═══════════════ MODAL ═══════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: #111111;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 40px 40px 32px 40px;
+      max-width: 640px;
+      width: calc(100% - 32px);
+      max-height: 85vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+      box-shadow: 0 8px 60px rgba(0, 0, 0, 0.5);
+      transform: translateY(16px);
+      transition: transform 0.25s ease;
+    }
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #6B7280;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      padding: 4px;
+    }
+    .modal-close:hover { color: var(--text-light); }
+    .modal-tag {
+      font-size: 12px;
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .modal-card h3 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #FAFAFA;
+      line-height: 1.5;
+    }
+    .modal-card p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.7;
+    }
+    .modal-card p.dim {
+      color: #6B7280;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAV ═══ -->
+  <nav>
+    <div class="nav-logo"><img src="sunglasses.png" alt="flowt" style="height: 20px; opacity: 0.9;"></div>
+    <div class="nav-links">
+      <a href="#features">features</a>
+      <a href="#download" class="nav-cta" style="color: #FFFFFF;">$ download for mac</a>
+    </div>
+    <button class="nav-pill" onclick="document.getElementById('why-modal').classList.add('active')">// Why I built this</button>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero" style="position:relative;">
+    <canvas id="grid-fx" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+    <div class="hero-text">
+      <span class="hero-badge">flowt // The terminal for product people</span>
+      <h1 class="typewriter-wrap">
+      <span class="typewriter-line line-1">Stop switching.</span>
+      <span class="typewriter-line line-2">Start shipping.</span>
+    </h1>
+      <p>Designed for vibe coding. Claude Code does the thinking and flowt handles the rest. Your whole workflow in one window.</p>
+    </div>
+  </section>
+
+  <!-- ═══ VIDEO (overlaps hero) ═══ -->
+  <div class="hero-video-section">
+    <div id="hero-vid" style="width: min(900px, 85vw); aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; border: 1px solid rgba(16,185,129,0.2); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(16,185,129,0.05); position: relative; cursor: pointer; background: #000;" onclick="this.innerHTML='<iframe width=100% height=100% src=https://www.youtube.com/embed/xunqMODO_Nk?rel=0&autoplay=1&modestbranding=1&controls=1&showinfo=0 frameborder=0 allow=accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture allowfullscreen style=display:block></iframe>';this.style.cursor='default'">
+      <img src="https://img.youtube.com/vi/xunqMODO_Nk/maxresdefault.jpg" alt="flowt demo" style="width:100%;height:100%;object-fit:cover;display:block;">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <svg width="68" height="68" viewBox="0 0 68 68" fill="none"><circle cx="34" cy="34" r="33" stroke="white" stroke-width="2" opacity="0.9"/><polygon points="27,22 27,46 48,34" fill="white" opacity="0.9"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TICKER ═══ -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span class="ticker-item">TABBED SESSIONS</span>
+      <span class="ticker-item">SIDE LIVE PREVIEW</span>
+      <span class="ticker-item">DEVICE EMULATION</span>
+      <span class="ticker-item">CLAUDE.AI TAB</span>
+      <span class="ticker-item">CUSTOM INPUT BAR</span>
+      <span class="ticker-item">ONE CLICK SCREENSHOT ATTACH</span>
+      <span class="ticker-item">IMAGE ANNOTATION</span>
+      <span class="ticker-item">BROWSER LOGGER</span>
+      <span class="ticker-item">ONE CLICK DEBUG LOG ATTACH</span>
+      <span class="ticker-item">NOTES PANEL</span>
+      <span class="ticker-item">CHECKLISTS PANEL</span>
+      <span class="ticker-item">MARKDOWN FILES PANEL</span>
+      <span class="ticker-item">TABBED SESSIONS</span>
+      <span class="ticker-item">SIDE LIVE PREVIEW</span>
+      <span class="ticker-item">DEVICE EMULATION</span>
+      <span class="ticker-item">CLAUDE.AI TAB</span>
+      <span class="ticker-item">CUSTOM INPUT BAR</span>
+      <span class="ticker-item">ONE CLICK SCREENSHOT ATTACH</span>
+      <span class="ticker-item">IMAGE ANNOTATION</span>
+      <span class="ticker-item">BROWSER LOGGER</span>
+      <span class="ticker-item">ONE CLICK DEBUG LOG ATTACH</span>
+      <span class="ticker-item">NOTES PANEL</span>
+      <span class="ticker-item">CHECKLISTS PANEL</span>
+      <span class="ticker-item">MARKDOWN FILES PANEL</span>
+    </div>
+  </div>
+
+  <!-- ═══ PROBLEM ═══ -->
+  <section class="section section-dark">
+    <div class="container reveal">
+      <div class="section-label glitch" data-text="// the problem">// the problem</div>
+      <h2 class="section-title">Your terminal wasn't designed for vibe coding</h2>
+      <p class="section-subtitle">Vibe coding with claude code means constantly switching between your terminal, a browser, and your dev tools. Every alt-tab is a context switch. Every copy-paste is friction.</p>
+      <div class="problem-cards">
+        <div class="problem-card">
+          <h3>Alt-tab whiplash</h3>
+          <p>Terminal → browser → terminal → browser → Finder → terminal. You're spending half your time navigating windows instead of actually building.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Copy-paste archaeology</h3>
+          <p>Something broke in the browser. Now you need to open DevTools, find the error, copy it, switch to terminal, paste it. By the time you're done, you've lost your flow.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Screenshot gymnastics</h3>
+          <p>You want to show Claude what the page looks like. So you screenshot it, find it in Finder, drag it to the terminal, hope the path is right. Every. Single. Time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══ FEATURES ═══ -->
+  <section id="features" class="section" style="background: #000;">
+    <div class="container reveal">
+      <div class="section-label">// features</div>
+      <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="12" y1="3" x2="12" y2="17"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <h3>Side Live Preview</h3>
+          <p>Terminal on the left, live preview on the right. Everything in one window. Embedded Chromium browser where you can test while you build in the same window.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+          <h3>One click Screenshot Attach</h3>
+          <p>One click captures the current preview state and drops it as an image into your message. Preview and draw on top of it. Sent directly into the terminal.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <h3>One Click Debug Log Attach</h3>
+          <p>One click sends your current browser logs to the input bar as an attached text block. You choose log type and record count.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 12h.01M10 12h.01"/><line x1="14" y1="12" x2="18" y2="12"/></svg></div>
+          <h3>Custom Input Bar</h3>
+          <p>Rich text field for composing messages. Supports Shift+Enter for newlines, arrow up for history, and image attachments.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg></div>
+          <h3>Device Emulation</h3>
+          <p>128 device presets across 12 categories: iPhone, iPad, Samsung, Pixel, and more. Native resolution, scaled to fit.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></div>
+          <h3>Tabbed Sessions</h3>
+          <p>Multiple independent shell sessions, each with a custom label. Double-click to rename, drag to reorder, Cmd+1-9 to jump.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <h3>Image Annotation</h3>
+          <p>Click a screenshot thumbnail to draw on it before sending. Five colors, freehand drawing, composited onto the original.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <h3>Markdown Files Panel</h3>
+          <p>Auto-detects your project directory and lists all .md files. Expandable with rendered markdown, updates in real time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <h3>Notes Panel</h3>
+          <p>A persistent scratchpad with syntax-highlighted keywords: todo, questions, api keys. Supports bold, headings, and lists.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>Checklists Panel</h3>
+          <p>Multiple named checklists with tabs. Add items, check them off, clear done. Persists across sessions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>Claude.ai Tab</h3>
+          <p>The right panel has a second tab that embeds claude.ai directly. Reference Claude's web interface without leaving the app.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+          <h3>Browser Logger</h3>
+          <p>Captures console output, network requests, JS errors, and failed fetches in real time via Chrome DevTools Protocol. Filterable by type.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PHILOSOPHY ═══ -->
+  <section class="section philosophy" style="background: #0f0f0f;">
+    <div class="container reveal">
+      <div class="section-label">// philosophy</div>
+      <h2 class="section-title">What flowt is <span class="strikethrough-delay">not</span></h2>
+      <p class="section-subtitle">Flowt adds no intelligence, makes no API calls, and has no opinion about your code. It is purely a better-shaped window for the way a vibe coding session actually runs.</p>
+      <ul class="philosophy-list">
+        <li><span class="x">×</span> does not call the Anthropic API</li>
+        <li><span class="x">×</span> does not suggest commands or autocomplete prompts</li>
+        <li><span class="x">×</span> does not intercept, modify, or process terminal output</li>
+        <li><span class="x">×</span> has zero awareness of your code or conversations</li>
+      </ul>
+      <p class="philosophy-closing">If you closed Flowt and opened any other terminal app, Claude Code would behave identically. This one just removes the friction from everything around it.</p>
+    </div>
+  </section>
+
+  <!-- ═══ CTA ═══ -->
+  <section id="download" class="section cta" style="background: #000; position: relative;">
+    <canvas id="grid-fx-cta" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+    <div class="container reveal">
+      <h2>Stop switching.<br><span style="color: var(--green);">Start flowing.</span></h2>
+      <p>Free and open source. Built for mac. Designed for claude code.</p>
+      <div class="cta-buttons">
+        <button class="btn-primary">$ download for mac</button>
+        <a href="https://github.com/lautarorb/flowt-terminal"><button class="btn-secondary">view on github</button></a>
+      </div>
+      <div class="cta-meta">Mac only · Open source · Built with claude code</div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-brand">
+      <div class="logo">flowt</div>
+      <div class="tagline">the terminal for product people</div>
+    </div>
+    <div class="footer-icon"><img src="sunglasses.png" alt="flowt" style="height: 48px;"></div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>product</h4>
+        <a href="#features">features</a>
+        <a href="#download">download</a>
+        <a href="#">changelog</a>
+      </div>
+      <div class="footer-col">
+        <h4>community</h4>
+        <a href="https://github.com/lautarorb/flowt-terminal">github</a>
+        <a href="https://github.com/lautarorb/flowt-terminal/issues">issues</a>
+        <a href="https://github.com/lautarorb/flowt-terminal/discussions">discussions</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ REVEAL ON SCROLL ═══ -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+
+    // Feature cards expand on mobile
+    document.querySelectorAll('.feature-card').forEach(card => {
+      const toggle = () => card.classList.toggle('expanded');
+      card.addEventListener('click', toggle);
+      card.addEventListener('touchend', (e) => { e.preventDefault(); toggle(); });
+    });
+
+    // Strikethrough on scroll into view
+    const strikeEl = document.querySelector('.strikethrough-delay');
+    if (strikeEl) {
+      let strikeDone = false;
+      window.addEventListener('scroll', () => {
+        if (strikeDone) return;
+        const rect = strikeEl.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.8) {
+          strikeEl.classList.add('active');
+          strikeDone = true;
+        }
+      }, { passive: true });
+    }
+
+    // Hero parallax — text scrolls at 0.4x speed (stays behind), fades out
+    // Video scales up slightly as it enters view
+    const heroText = document.querySelector('.hero-text');
+    const hero = document.querySelector('.hero');
+    const heroVid = document.getElementById('hero-vid');
+    if (heroText && hero && heroVid) {
+      window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        const heroH = hero.offsetHeight;
+        const progress = Math.min(scrollY / (heroH * 0.5), 1);
+        heroText.style.transform = `translateY(${scrollY * 0.4}px)`;
+        heroText.style.opacity = 1 - progress * 1.2;
+
+        const scale = 1 + progress * 0.2;
+        heroVid.style.transform = `scale(${scale})`;
+      }, { passive: true });
+    }
+
+
+    // Grid hover effect (hero + CTA)
+    const SQ = 100;
+    function createGridFX(canvasId, sectionEl) {
+      const cvs = document.getElementById(canvasId);
+      const ctx = cvs.getContext('2d');
+      const cells = [];
+
+      function size() { cvs.width = sectionEl.offsetWidth; cvs.height = sectionEl.offsetHeight; }
+      function init() {
+        cells.length = 0;
+        for (let x = 0; x < cvs.width; x += SQ)
+          for (let y = 0; y < cvs.height; y += SQ)
+            cells.push({ x, y, alpha: 0, fading: false, lastTouched: 0 });
+      }
+
+      window.addEventListener('resize', () => { size(); init(); });
+      window.addEventListener('mousemove', (e) => {
+        const r = sectionEl.getBoundingClientRect();
+        const mx = e.clientX - r.left, my = e.clientY - r.top;
+        if (mx < 0 || my < 0 || mx > r.width || my > r.height) return;
+        for (let i = 0; i < cells.length; i++) {
+          const c = cells[i];
+          if (mx >= c.x && mx < c.x + SQ && my >= c.y && my < c.y + SQ) {
+            if (c.alpha === 0) { c.alpha = 1; c.lastTouched = Date.now(); c.fading = false; }
+            break;
+          }
+        }
+      }, { passive: true });
+
+      function draw() {
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        const now = Date.now();
+        for (let i = 0; i < cells.length; i++) {
+          const c = cells[i];
+          if (c.alpha > 0 && !c.fading && now - c.lastTouched > 300) c.fading = true;
+          if (c.fading) { c.alpha -= 0.04; if (c.alpha <= 0) { c.alpha = 0; c.fading = false; } }
+          if (c.alpha > 0) {
+            const cx = c.x + SQ / 2, cy = c.y + SQ / 2;
+            const g = ctx.createRadialGradient(cx, cy, 5, cx, cy, SQ);
+            g.addColorStop(0, `rgba(16, 185, 129, ${c.alpha * 0.6})`);
+            g.addColorStop(1, `rgba(16, 185, 129, 0)`);
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(c.x + 0.5, c.y + 0.5, SQ - 1, SQ - 1);
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+
+      size(); init(); draw();
+    }
+
+    createGridFX('grid-fx', document.querySelector('.hero'));
+    createGridFX('grid-fx-cta', document.getElementById('download'));
+
+    // Drag-to-scroll for unlock slider
+    const slider = document.querySelector('.unlock-right');
+    if (slider) {
+      let isDown = false, startX, scrollLeft;
+      slider.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+      slider.addEventListener('mouseleave', () => { isDown = false; });
+      slider.addEventListener('mouseup', () => { isDown = false; });
+      slider.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; slider.scrollLeft = scrollLeft - (x - startX); });
+    }
+  </script>
+
+  <!-- ═══ STICKY PILL + MODAL ═══ -->
+  <button class="sticky-pill" onclick="document.getElementById('why-modal').classList.add('active')">// Why I built this</button>
+
+  <div class="modal-overlay" id="why-modal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal-card">
+      <button class="modal-close" onclick="document.getElementById('why-modal').classList.remove('active')">&#x2715;</button>
+      <span class="modal-tag">// Why I built this</span>
+      <h3>I'm not a developer. I'm a product person who builds things with Claude Code.</h3>
+      <p>A few months ago I started using Claude Code seriously and it changed everything. I could finally take an idea from zero to something real without getting stuck on the parts I don't know. But every session felt the same: terminal on one side, browser on the other, DevTools open somewhere, Finder in the background because I needed to drag a screenshot somewhere. Constant switching. Constant friction. Every alt-tab pulled me a little further out of the flow.</p>
+      <p>I know what you're thinking. "Just use the Claude Code app." I get it. But for me it didn't work. I like the terminal because of the transparency and speed, everything happening right in front of me in real time. The app felt slower and gave me less visibility into what was actually going on. I like to be in it, watching each step, jumping in when I want to. On top of that, conversation switching in the app takes time to load. It's not as fast as jumping between terminal tabs with Cmd+1. And I had nowhere for my notes, my checklists, a clear view of my markdown files at all times. The things I reach for constantly during a session.</p>
+      <p>I didn't want AI suggestions or autocomplete or anything that would get between me and Claude Code. I just wanted everything in the same window, shaped around the way I actually work.</p>
+      <p>So I built flowt. With Claude Code.</p>
+      <p class="dim">It's not perfect and it's not trying to be. It's a tool I use every day, and maybe you will too.</p>
+    </div>
+  </div>
+
+</body>
+</html>
