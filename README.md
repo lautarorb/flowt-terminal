@@ -12,7 +12,7 @@ I'm not a developer. I'm a product person who builds things with Claude Code.
 
 A few months ago I started using Claude Code seriously and it changed everything. I could finally take an idea from zero to something real without getting stuck on the parts I don't know. But every session felt the same: terminal on one side, browser on the other, DevTools open somewhere, Finder in the background because I needed to drag a screenshot somewhere. Constant switching. Constant friction. Every alt-tab pulled me a little further out of the flow.
 
-I tried Claude Code's own app but it felt slow, and more than that it gave me less visibility into what was actually happening. I like to see everything in real time. I like to be in it, watching each step, jumping in when I want to. A cleaner UI wasn't what I needed. I needed the raw terminal with everything else built around it.
+I know what you're thinking. "Just use the Claude Code app." I get it. But for me it didn't work. I like the terminal because of the transparency and speed, everything happening right in front of me in real time. The app felt slower and gave me less visibility into what was actually going on. I like to be in it, watching each step, jumping in when I want to. On top of that, conversation switching in the app takes time to load. It's not as fast as jumping between terminal tabs with Cmd+1. And I had nowhere for my notes, my checklists, a clear view of my markdown files at all times. The things I reach for constantly during a session.
 
 I didn't want AI suggestions or autocomplete or anything that would get between me and Claude Code. I just wanted everything in the same window, shaped around the way I actually work.
 
