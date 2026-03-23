@@ -17,9 +17,11 @@ export default function MarkdownFileRow({ file }: Props) {
       setContent(text);
       try {
         const { marked } = await import('marked');
-        setHtml(await marked(text));
+        const DOMPurify = (await import('dompurify')).default;
+        const raw = await marked(text);
+        setHtml(DOMPurify.sanitize(raw));
       } catch {
-        setHtml(`<pre>${text}</pre>`);
+        setHtml(`<pre>${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`);
       }
     });
   }, [expanded, file.path]);

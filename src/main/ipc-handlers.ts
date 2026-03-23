@@ -33,11 +33,14 @@ export function registerIpcHandlers(
 ): void {
   // PTY
   ipcMain.handle(IPC.PTY_CREATE, (_event, tabId: string, cwd?: string) => {
+    if (typeof tabId !== 'string' || !tabId) throw new Error('Invalid tabId');
+    if (cwd !== undefined && typeof cwd !== 'string') throw new Error('Invalid cwd');
     emitVerbose(window, `PTY created: ${tabId} (cwd: ${cwd || 'default'})`);
     return ptyManager.create(tabId, cwd);
   });
 
   ipcMain.on(IPC.PTY_WRITE, (_event, tabId: string, data: string) => {
+    if (typeof tabId !== 'string' || typeof data !== 'string') return;
     ptyManager.write(tabId, data);
   });
 
@@ -155,6 +158,11 @@ export function registerIpcHandlers(
   });
 
   ipcMain.handle(IPC.APP_SAVE_TEMP_IMAGE, async (_event, dataUrl: string, tabId?: string) => {
+    // Limit image size to 50MB to prevent resource exhaustion
+    const MAX_IMAGE_SIZE = 50 * 1024 * 1024;
+    if (!dataUrl || dataUrl.length > MAX_IMAGE_SIZE) {
+      throw new Error('Image too large or empty');
+    }
     // Save in project folder if we can detect it, otherwise fall back to temp
     let baseDir: string;
     if (tabId) {

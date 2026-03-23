@@ -70,6 +70,14 @@ export class FileWatcher {
   }
 
   async readFile(filePath: string): Promise<string> {
+    // Prevent path traversal — only allow reading files within the watched directory
+    if (this.cwd) {
+      const resolved = path.resolve(filePath);
+      const cwdResolved = path.resolve(this.cwd);
+      if (!resolved.startsWith(cwdResolved + path.sep) && resolved !== cwdResolved) {
+        throw new Error('Access denied: path outside project directory');
+      }
+    }
     return fs.promises.readFile(filePath, 'utf8');
   }
 

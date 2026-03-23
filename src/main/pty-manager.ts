@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron';
 import * as pty from 'node-pty';
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { IPC } from '../shared/ipc-channels';
 import { PromptDetector } from './prompt-detector';
 
@@ -90,8 +90,8 @@ export class PtyManager {
 
     try {
       // On macOS, use lsof to get the CWD of the shell's child process (or shell itself)
-      const pid = term.pid;
-      const output = execSync(`lsof -a -p ${pid} -d cwd -Fn 2>/dev/null`, { encoding: 'utf8', timeout: 2000 });
+      const pid = String(term.pid);
+      const output = execFileSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8', timeout: 2000 });
       const lines = output.split('\n');
       for (const line of lines) {
         if (line.startsWith('n') && line.length > 1) {
