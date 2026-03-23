@@ -23,7 +23,7 @@ interface Props {
 }
 
 const TOOLS: { key: Tool; label: string }[] = [
-  { key: 'move', label: '⇥' },
+  { key: 'move', label: '✋' },
   { key: 'pen', label: '✎' },
   { key: 'line', label: '╱' },
   { key: 'arrow', label: '→' },
@@ -365,7 +365,7 @@ export default function ImageAnnotator({ src, onSave, onCancel }: Props) {
 
   const tb = (t: Tool): React.CSSProperties => ({
     width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-    borderRadius: 6, fontSize: 15, cursor: 'pointer',
+    borderRadius: 6, fontSize: 20, cursor: 'pointer',
     background: tool === t ? 'rgba(255,255,255,0.15)' : 'transparent',
     color: tool === t ? '#fff' : 'rgba(255,255,255,0.5)',
     border: tool === t ? '1px solid rgba(255,255,255,0.3)' : '1px solid transparent',
@@ -382,8 +382,8 @@ export default function ImageAnnotator({ src, onSave, onCancel }: Props) {
           <button key={c} onClick={() => setColor(c)} style={{ width: 22, height: 22, borderRadius: '50%', background: c, border: color === c ? '2px solid #fff' : '2px solid transparent', cursor: 'pointer', flexShrink: 0 }} />
         ))}
         <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.2)', margin: '0 4px' }} />
-        <button onClick={handleUndo} style={{ padding: '4px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>Undo</button>
-        {selectedIdx !== null && <button onClick={handleDelete} style={{ padding: '4px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 11 }}>Delete</button>}
+        <button onClick={handleUndo} style={{ padding: '4px 10px', borderRadius: 6, background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Undo</button>
+        {selectedIdx !== null && <button onClick={handleDelete} style={{ padding: '4px 10px', borderRadius: 6, background: 'rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 12 }}>Delete</button>}
         <button onClick={handleSave} style={{ padding: '4px 12px', borderRadius: 6, background: 'var(--accent-green)', color: '#000', fontSize: 12, fontWeight: 700 }}>Save</button>
         <button onClick={onCancel} style={{ padding: '4px 12px', borderRadius: 6, background: 'rgba(255,255,255,0.1)', color: 'var(--text-primary)', fontSize: 12 }}>Cancel</button>
       </div>
