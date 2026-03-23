@@ -181,6 +181,10 @@ function resizeShape(shape: Shape, handle: Handle, pos: Point): Shape {
   if (resized.start) resized.start = transformPoint(resized.start);
   if (resized.end) resized.end = transformPoint(resized.end);
 
+  // Scale line width / font size proportionally
+  const scale = Math.max(scaleX, scaleY);
+  resized.lineWidth = Math.max(1, shape.lineWidth * scale);
+
   return resized;
 }
 
