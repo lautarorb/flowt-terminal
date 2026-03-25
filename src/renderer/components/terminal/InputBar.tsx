@@ -124,16 +124,29 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
 
     if (parts.length === 0) return;
 
-    // If only images (no text, no logs), add a prompt so Claude Code processes the image
+    const hasAttachments = attachments.length > 0 || textAttachments.length > 0;
     const hasText = text || textAttachments.length > 0;
-    const fullMessage = hasText ? parts.join(' ') : 'See attached image: ' + parts.join(' ');
+    const tabId = activeTabId;
 
-    // Send message content first, then Enter separately
-    // Claude Code treats pasted text as a block — \r must come after the paste is fully processed
-    window.vibeAPI.pty.write(activeTabId, fullMessage);
-    setTimeout(() => {
-      window.vibeAPI.pty.write(activeTabId, '\r');
-    }, 500);
+    if (!hasAttachments) {
+      // Text-only: send immediately, no delays needed
+      window.vibeAPI.pty.write(tabId, text);
+      window.vibeAPI.pty.write(tabId, '\r');
+    } else {
+      // Has attachments: write each part sequentially with delays
+      // to avoid PTY buffer overflow. 150ms per part keeps it responsive
+      // while reliably delivering all paths (~3s for 20 images).
+      const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+      (async () => {
+        for (let i = 0; i < parts.length; i++) {
+          const prefix = i === 0 ? '' : ' ';
+          window.vibeAPI.pty.write(tabId, prefix + parts[i]);
+          await delay(150);
+        }
+        await delay(200);
+        window.vibeAPI.pty.write(tabId, '\r');
+      })();
+    }
     setHistory((prev) => [...prev, text || 'attachment']);
     setHistoryIndex(-1);
 
