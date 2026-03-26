@@ -29,7 +29,7 @@ Embedded Chromium browser on the right, terminal on the left. Type a URL in the 
 Capture the current preview state and drop it as an image into your next message to Claude Code. Sent directly into the terminal as a file path Claude can read.
 
 ### Image Annotation
-Click a screenshot thumbnail to draw on it before sending. Five colors (red, green, yellow, cyan, white), freehand drawing, composited onto the original image.
+Click a screenshot thumbnail to annotate before sending. Seven tools: freehand pen, line, arrow, rectangle, circle, and text — plus move and resize. Five stroke colors (red, green, yellow, cyan, white). Shapes scale proportionally when resized. Composited onto the original image as a single PNG.
 
 ### One Click Debug Log Attach
 Click "Add logs" and choose what to attach via a modal: filter by log type (All, Errors, Network, Console, Verbose), select record count (All, Last 25, Last 100), and optionally save your preferences.

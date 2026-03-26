@@ -39,6 +39,8 @@ npm run make     # Build DMG for distribution
 - Startup checks for Full Disk Access and prompts user to grant it if missing
 - PTY spawns as login shell (`--login`) with cleaned env (strips ELECTRON_* vars)
 - `fit()` preserves scroll position when user is scrolled up reading history
+- Image attach writes each part (text, then each file path) sequentially with 150ms async delays to avoid PTY buffer overflow; text-only messages send instantly
+- ImageAnnotator supports 7 tools: pen (freehand), line, arrow, rect, circle, text, and move/resize with proportional scaling
 
 ## Project Structure
 
@@ -65,11 +67,11 @@ src/
 │   │   ├── preview/     # PreviewFrame, UrlBar, DeviceSelector, device-presets
 │   │   ├── logger/      # LogDrawer, LogFilter, LogEntry, AttachLogsModal
 │   │   ├── panels/      # NotesPanel, MarkdownPanel, MarkdownFileRow, ChecklistPanel
-│   │   └── shared/      # ActionButton, AttachmentThumb, ImageAnnotator
+│   │   └── shared/      # ActionButton, AttachmentThumb, ImageAnnotator (7 tools: pen, line, arrow, rect, circle, text, move)
 │   ├── lib/types.ts     # TabState, TabAction, LogFilter, InputMode
 │   └── styles/          # tokens.css, global.css, fonts.css
-├── shared/              # IPC channels (38 channels) + types (11 interfaces)
-└── preload/             # contextBridge API (22+ methods across 9 namespaces)
+├── shared/              # IPC channels (38 channels) + types (9 exports)
+└── preload/             # contextBridge API (39+ methods across 13 namespaces)
 ```
 
 ## Building & Distribution

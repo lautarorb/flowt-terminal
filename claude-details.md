@@ -21,7 +21,7 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 ### Input System
 - **Single chat input bar** — compose messages, hit Enter to send to PTY via `\r` (carriage return, not `\n`)
 - **Text attachments** (logs) shown as collapsible blocks above input — expand/collapse for 10+ lines
-- **Image attachments** saved to `<project>/.flowt/screenshot-xxx.png`, file path sent to PTY so Claude Code can read them
+- **Image attachments** saved to `<project>/.flowt/screenshot-xxx.png`, file paths sent to PTY sequentially with 150ms delays to avoid buffer overflow (text-only messages send instantly)
 - **Ctrl+C** always sends SIGINT (`\x03`) regardless of focus
 
 ### Preview (WebContentsView)
@@ -126,11 +126,17 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 | @electron-forge/maker-dmg | Build macOS DMG installer |
 
 ### Image Annotator
-- Freehand drawing overlay on screenshot attachments before sending
+- Full annotation overlay on screenshot attachments before sending
 - Canvas-based: mouse events on a transparent canvas overlaying the image
+- **7 tools**: pen (freehand), line, arrow, rect, circle, text, and move/resize
 - 5 predefined colors: red (#EF4444), green (#10B981), yellow (#F59E0B), cyan (#06B6D4), white (#FFFFFF)
 - Stroke width scales with image resolution (`canvasWidth / 200`, min 3px)
-- Save composites original image + drawings into a single PNG dataURL that replaces the attachment
+- Shape resizing with proportional scaling of line width and font size
+- Shape movement with (dx, dy) translation
+- Selection feedback: cyan dashed box with corner handles
+- Keyboard shortcuts: Delete/Backspace to remove shape, Cmd/Ctrl+Z to undo
+- Text input: click to place, type, Enter to submit, Escape to cancel
+- Save composites original image + all annotations into a single PNG dataURL that replaces the attachment
 - Image has `pointer-events: none` and `draggable={false}` to prevent browser drag interference
 
 ### Checklists Panel

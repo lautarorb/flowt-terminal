@@ -83,7 +83,7 @@ A floating panel accessible from the "Checklists" button in the tab bar (between
 
 ## Image Annotation
 
-When you click a screenshot thumbnail in the input bar, a freehand drawing overlay opens. Choose from 5 colors (red, green, yellow, cyan, white) and draw directly on the image. Save composites your drawings onto the original image before sending to Claude Code.
+When you click a screenshot thumbnail in the input bar, an annotation overlay opens with 7 tools: freehand pen, straight line, arrow, rectangle, circle, and text — plus move and resize. Choose from 5 stroke colors (red, green, yellow, cyan, white). Shapes scale proportionally when resized. Delete/Backspace removes selected shapes, Cmd+Z undoes. Save composites all annotations onto the original image before sending to Claude Code.
 
 ## Markdown Files Panel
 
@@ -95,4 +95,4 @@ Flowt does not call the Anthropic API. It does not suggest commands, autocomplet
 
 ## Platform and Stack
 
-Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 38 IPC channels across 9 namespaces. 48 unit tests covering port detection and route tracking. Distributable as a macOS DMG installer.
+Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 38 IPC channels across 13 namespaces. 40 unit tests covering port detection and route tracking. Distributable as a macOS DMG installer.

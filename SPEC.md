@@ -21,7 +21,7 @@ Flowt follows Electron's multi-process architecture with strict security boundar
 │  │RouteTrk. │ │  View)        │ │          │           │
 │  └──────────┘ └───────────────┘ └──────────┘           │
 │                                                         │
-│                 IPC Handlers (36 channels)               │
+│                 IPC Handlers (38 channels)               │
 └─────────────────────┬───────────────────────────────────┘
                       │ contextBridge (vibeAPI)
 ┌─────────────────────┴───────────────────────────────────┐
@@ -396,9 +396,10 @@ Log.enable      → browser-level log entries
 4. inputBarRef.addImage(dataUrl) → thumbnail appears in InputBar
 5. User types message, hits Enter
 6. IPC APP_SAVE_TEMP_IMAGE → saves PNG to <project>/.flowt/screenshot-xxx.png
-7. File path appended to message text
-8. Full text written to PTY via PTY_WRITE, then \r after 500ms delay
-9. Claude Code receives message + file path, reads the image
+7. File path appended to message parts array
+8. Each part (text, then each file path) written to PTY sequentially with 150ms async delays to avoid PTY buffer overflow; text-only messages send instantly
+9. \r (Enter) sent after all parts are written (200ms after last part)
+10. Claude Code receives message + file paths, reads the images
 ```
 
 ### 6.4 Attach Logs to Message
@@ -498,7 +499,7 @@ OnlyLoadAppFromAsar: true               — prevents loading from filesystem
 - **Framework**: Jest 30.3 + ts-jest 29.4
 - **Environment**: Node (not jsdom — tests are for main process modules)
 - **Location**: `tests/unit/`
-- **Coverage**: Port detector (24 tests), Route tracker (24 tests)
+- **Coverage**: Port detector (18 tests), Route tracker (22 tests)
 
 ### 8.2 Port Detector Tests
 
