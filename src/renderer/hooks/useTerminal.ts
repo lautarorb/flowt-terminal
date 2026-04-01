@@ -198,9 +198,13 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
     const term = terminalRef.current;
     if (!term) return;
     const current = term.options.fontSize || DEFAULT_FONT_SIZE;
-    if (direction === 'in') term.options.fontSize = Math.min(28, current + 1);
-    else if (direction === 'out') term.options.fontSize = Math.max(8, current - 1);
-    else if (direction === 'reset') term.options.fontSize = DEFAULT_FONT_SIZE;
+    let next = current;
+    if (direction === 'in') next = Math.min(28, current + 1);
+    else if (direction === 'out') next = Math.max(8, current - 1);
+    else if (direction === 'reset') next = DEFAULT_FONT_SIZE;
+    term.options.fontSize = next;
+    // Sync CSS variable so InputBar compose field scales with terminal
+    document.documentElement.style.setProperty('--font-size-terminal', next + 'px');
     fit();
   }, [fit]);
 

@@ -79,6 +79,22 @@ export function buildMenu(window: BrowserWindow): void {
           click: () => { if (!window.isDestroyed()) window.webContents.send('terminal:zoom', 'reset'); },
         },
         { type: 'separator' },
+        {
+          label: 'Increase All Fonts',
+          accelerator: 'Cmd+Option+=',
+          click: () => { if (!window.isDestroyed()) window.webContents.send('ui:zoom', 'in'); },
+        },
+        {
+          label: 'Decrease All Fonts',
+          accelerator: 'Cmd+Option+-',
+          click: () => { if (!window.isDestroyed()) window.webContents.send('ui:zoom', 'out'); },
+        },
+        {
+          label: 'Reset All Fonts',
+          accelerator: 'Cmd+Option+0',
+          click: () => { if (!window.isDestroyed()) window.webContents.send('ui:zoom', 'reset'); },
+        },
+        { type: 'separator' },
         { role: 'togglefullscreen' },
       ],
     },

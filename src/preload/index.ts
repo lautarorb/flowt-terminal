@@ -101,6 +101,10 @@ const vibeAPI = {
     onSearch: (cb: () => void) => on('terminal:search', () => cb()),
   },
 
+  ui: {
+    onZoom: (cb: (direction: string) => void) => on('ui:zoom', (_e: any, dir: string) => cb(dir)),
+  },
+
   window: {
     onFullscreenChanged: (cb: (isFullscreen: boolean) => void) =>
       on('fullscreen-changed', (_e: any, isFullscreen: boolean) => cb(isFullscreen)),

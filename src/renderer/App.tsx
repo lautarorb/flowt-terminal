@@ -44,6 +44,22 @@ export default function App() {
     return cleanup;
   }, []);
 
+  // UI zoom (Cmd+Option+/- scales all app fonts)
+  useEffect(() => {
+    const defaults = { terminal: 13, ui: 12, sm: 11 };
+    let scale = 0; // offset in px from defaults
+    const cleanup = window.vibeAPI.ui.onZoom((dir) => {
+      if (dir === 'in') scale = Math.min(8, scale + 1);
+      else if (dir === 'out') scale = Math.max(-4, scale - 1);
+      else if (dir === 'reset') scale = 0;
+      const root = document.documentElement;
+      root.style.setProperty('--font-size-terminal', (defaults.terminal + scale) + 'px');
+      root.style.setProperty('--font-size-ui', (defaults.ui + scale) + 'px');
+      root.style.setProperty('--font-size-sm', (defaults.sm + scale) + 'px');
+    });
+    return cleanup;
+  }, []);
+
   // Menu shortcuts
   useEffect(() => {
     const cleanupNew = window.vibeAPI.menu.onNewTab(() => addTab());
