@@ -6,8 +6,10 @@ import UrlBar from '../preview/UrlBar';
 import PreviewFrame from '../preview/PreviewFrame';
 import LogDrawer from '../logger/LogDrawer';
 import AttachLogsModal from '../logger/AttachLogsModal';
+import TasksPanel from '../panels/TasksPanel';
+import type { Task, TaskStatus, TaskStore } from '../../hooks/useTasks';
 
-type RightTab = 'preview' | 'claude';
+type RightTab = 'preview' | 'claude' | 'tasks';
 
 interface Props {
   url: string;
@@ -25,6 +27,30 @@ interface Props {
   clearLogs: () => void;
   onAttachLogs: (text: string) => void;
   onAttachScreenshot: () => void;
+  // Tasks
+  taskStore: TaskStore;
+  taskActiveListId: string | null;
+  taskActiveFilter: TaskStatus;
+  onTaskSetActiveListId: (id: string) => void;
+  onTaskSetActiveFilter: (status: TaskStatus) => void;
+  onTaskAddList: () => string;
+  onTaskRemoveList: (id: string) => void;
+  onTaskRenameList: (id: string, name: string) => void;
+  onTaskAddTask: (listId: string, status?: TaskStatus) => string;
+  onTaskUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'images' | 'order'>>) => void;
+  onTaskDeleteTask: (taskId: string) => void;
+  onTaskSetTaskStatus: (taskId: string, status: TaskStatus) => void;
+  onTaskToggleDone: (taskId: string) => void;
+  onTaskReorderTask: (taskId: string, newOrder: number) => void;
+  onTaskAddComment: (taskId: string, text: string) => void;
+  onTaskAddImage: (taskId: string, dataUrl: string) => void;
+  onTaskRemoveImage: (taskId: string, index: number) => void;
+  onTaskUpdateImage: (taskId: string, index: number, dataUrl: string) => void;
+  onTaskClearDone: (listId: string) => void;
+  onTaskSendToTerminal: (text: string, images: string[]) => void;
+  taskGetFilteredTasks: (listId: string, status: TaskStatus) => Task[];
+  taskGetStatusCounts: (listId: string) => Record<TaskStatus, number>;
+  taskNonDoneCount: number;
 }
 
 export default function RightPanel({
@@ -43,6 +69,30 @@ export default function RightPanel({
   clearLogs,
   onAttachLogs,
   onAttachScreenshot,
+  // Tasks
+  taskStore,
+  taskActiveListId,
+  taskActiveFilter,
+  onTaskSetActiveListId,
+  onTaskSetActiveFilter,
+  onTaskAddList,
+  onTaskRemoveList,
+  onTaskRenameList,
+  onTaskAddTask,
+  onTaskUpdateTask,
+  onTaskDeleteTask,
+  onTaskSetTaskStatus,
+  onTaskToggleDone,
+  onTaskReorderTask,
+  onTaskAddComment,
+  onTaskAddImage,
+  onTaskRemoveImage,
+  onTaskUpdateImage,
+  onTaskClearDone,
+  onTaskSendToTerminal,
+  taskGetFilteredTasks,
+  taskGetStatusCounts,
+  taskNonDoneCount,
 }: Props) {
   const [activeTab, setActiveTab] = useState<RightTab>('preview');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -52,7 +102,7 @@ export default function RightPanel({
   // The preview WebContentsView should be hidden when:
   // 1. The device selector dropdown is open (it renders above DOM)
   // 2. The Claude tab is active
-  const previewHidden = dropdownOpen || activeTab === 'claude';
+  const previewHidden = dropdownOpen || activeTab !== 'preview';
 
   // Hide/show preview WebContentsView
   useEffect(() => {
@@ -164,6 +214,22 @@ export default function RightPanel({
         >
           Claude
         </button>
+        <button
+          onClick={() => setActiveTab('tasks')}
+          style={{
+            padding: '0 16px',
+            height: '100%',
+            fontSize: 'var(--font-size-sm)',
+            color: activeTab === 'tasks' ? 'var(--text-primary)' : 'var(--text-muted)',
+            background: activeTab === 'tasks' ? 'var(--bg-primary)' : 'transparent',
+            borderBottom: activeTab === 'tasks' ? '2px solid var(--text-primary)' : '2px solid transparent',
+            fontWeight: activeTab === 'tasks' ? 'bold' : 'normal',
+          }}
+          onMouseEnter={(e) => { if (activeTab !== 'tasks') e.currentTarget.style.color = 'var(--text-secondary)'; }}
+          onMouseLeave={(e) => { if (activeTab !== 'tasks') e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          Tasks{taskNonDoneCount > 0 ? ` (${taskNonDoneCount})` : ''}
+        </button>
         {activeTab === 'claude' && (
           <button
             onClick={() => window.vibeAPI.claude.reload()}
@@ -271,6 +337,34 @@ export default function RightPanel({
           background: 'var(--bg-primary)',
         }}
       />
+
+      {/* Tasks content */}
+      <div style={{ flex: 1, display: activeTab === 'tasks' ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}>
+        <TasksPanel
+          store={taskStore}
+          activeListId={taskActiveListId}
+          activeFilter={taskActiveFilter}
+          onSetActiveListId={onTaskSetActiveListId}
+          onSetActiveFilter={onTaskSetActiveFilter}
+          onAddList={onTaskAddList}
+          onRemoveList={onTaskRemoveList}
+          onRenameList={onTaskRenameList}
+          onAddTask={onTaskAddTask}
+          onUpdateTask={onTaskUpdateTask}
+          onDeleteTask={onTaskDeleteTask}
+          onSetTaskStatus={onTaskSetTaskStatus}
+          onToggleDone={onTaskToggleDone}
+          onReorderTask={onTaskReorderTask}
+          onAddComment={onTaskAddComment}
+          onAddImage={onTaskAddImage}
+          onRemoveImage={onTaskRemoveImage}
+          onUpdateImage={onTaskUpdateImage}
+          onClearDone={onTaskClearDone}
+          onSendToTerminal={onTaskSendToTerminal}
+          getFilteredTasks={taskGetFilteredTasks}
+          getStatusCounts={taskGetStatusCounts}
+        />
+      </div>
 
       {/* Attach logs modal */}
       {logsModalOpen && (

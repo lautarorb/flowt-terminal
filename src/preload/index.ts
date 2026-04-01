@@ -64,6 +64,11 @@ const vibeAPI = {
     save: (data: string) => ipcRenderer.send(IPC.CHECKLISTS_SAVE, data),
   },
 
+  tasks: {
+    load: () => ipcRenderer.invoke(IPC.TASKS_LOAD) as Promise<string>,
+    save: (data: string) => ipcRenderer.send(IPC.TASKS_SAVE, data),
+  },
+
   mdFiles: {
     list: () => ipcRenderer.invoke(IPC.MD_FILES_LIST),
     read: (filePath: string) => ipcRenderer.invoke(IPC.MD_FILES_READ, filePath) as Promise<string>,

@@ -4,6 +4,7 @@ import { usePreview } from './hooks/usePreview';
 import { useNotes } from './hooks/useNotes';
 import { useLogs } from './hooks/useLogs';
 import { useChecklists } from './hooks/useChecklists';
+import { useTasks } from './hooks/useTasks';
 import SplitLayout from './components/layout/SplitLayout';
 import LeftPanel from './components/layout/LeftPanel';
 import RightPanel from './components/layout/RightPanel';
@@ -20,6 +21,18 @@ export default function App() {
     addItem: addChecklistItem, toggleItem: toggleChecklistItem, removeItem: removeChecklistItem,
     toggle: toggleChecklists, close: closeChecklists,
   } = useChecklists();
+  const {
+    store: taskStore,
+    activeListId: taskActiveListId, setActiveListId: setTaskActiveListId,
+    activeFilter: taskActiveFilter, setActiveFilter: setTaskActiveFilter,
+    addList: addTaskList, removeList: removeTaskList, renameList: renameTaskList,
+    addTask, updateTask, deleteTask,
+    setTaskStatus, toggleDone: toggleTaskDone, reorderTask,
+    addComment: addTaskComment,
+    addImage: addTaskImage, removeImage: removeTaskImage, updateImage: updateTaskImage,
+    clearDone: clearTaskDone,
+    getFilteredTasks, getStatusCounts, getNonDoneCount,
+  } = useTasks();
   const [mdOpen, setMdOpen] = useState(false);
   const inputBarRef = useRef<InputBarHandle>(null);
 
@@ -96,6 +109,13 @@ export default function App() {
     }
   }, []);
 
+  const handleTaskSendToTerminal = useCallback((text: string, images: string[]) => {
+    inputBarRef.current?.appendText(text, 'task details');
+    for (const img of images) {
+      inputBarRef.current?.addImage(img);
+    }
+  }, []);
+
   return (
     <SplitLayout
       left={
@@ -148,6 +168,29 @@ export default function App() {
           clearLogs={clearLogs}
           onAttachLogs={handleAttachLogs}
           onAttachScreenshot={handleAttachScreenshot}
+          taskStore={taskStore}
+          taskActiveListId={taskActiveListId}
+          taskActiveFilter={taskActiveFilter}
+          onTaskSetActiveListId={setTaskActiveListId}
+          onTaskSetActiveFilter={setTaskActiveFilter}
+          onTaskAddList={addTaskList}
+          onTaskRemoveList={removeTaskList}
+          onTaskRenameList={renameTaskList}
+          onTaskAddTask={addTask}
+          onTaskUpdateTask={updateTask}
+          onTaskDeleteTask={deleteTask}
+          onTaskSetTaskStatus={setTaskStatus}
+          onTaskToggleDone={toggleTaskDone}
+          onTaskReorderTask={reorderTask}
+          onTaskAddComment={addTaskComment}
+          onTaskAddImage={addTaskImage}
+          onTaskRemoveImage={removeTaskImage}
+          onTaskUpdateImage={updateTaskImage}
+          onTaskClearDone={clearTaskDone}
+          onTaskSendToTerminal={handleTaskSendToTerminal}
+          taskGetFilteredTasks={getFilteredTasks}
+          taskGetStatusCounts={getStatusCounts}
+          taskNonDoneCount={getNonDoneCount()}
         />
       }
     />

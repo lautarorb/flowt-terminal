@@ -41,6 +41,9 @@ npm run make     # Build DMG for distribution
 - `fit()` preserves scroll position when user is scrolled up reading history
 - Image attach writes each part (text, then each file path) sequentially with 150ms async delays to avoid PTY buffer overflow; text-only messages send instantly
 - ImageAnnotator supports 7 tools: pen (freehand), line, arrow, rect, circle, text, and move/resize with proportional scaling
+- Tasks panel is the third tab in the right panel (Preview, Claude, Tasks) with full CRUD, drag-to-reorder, drag-to-status-tab, inline markdown editing, image attachments with annotator, comments, and "send to terminal" that populates the compose bar
+- Tasks persist globally via electron-store (same as Notes/Checklists), with user-created project lists for organization
+- Text attachments in InputBar support custom labels (e.g., "task details" vs "attached logs") via the `label` parameter on `appendText`
 
 ## Project Structure
 
@@ -60,18 +63,18 @@ src/
 │   └── menu.ts          # macOS menu with Cmd+T/Cmd+W shortcuts
 ├── renderer/            # React UI
 │   ├── App.tsx          # Root component, hook coordination, keyboard shortcuts
-│   ├── hooks/           # useTerminal (search, zoom), useTabs, usePreview, useNotes, useLogs, useChecklists
+│   ├── hooks/           # useTerminal (search, zoom), useTabs, usePreview, useNotes, useLogs, useChecklists, useTasks
 │   ├── components/
 │   │   ├── layout/      # SplitLayout, LeftPanel, RightPanel
 │   │   ├── terminal/    # TerminalView, TerminalTabs, InputBar, QuickResponse
 │   │   ├── preview/     # PreviewFrame, UrlBar, DeviceSelector, device-presets
 │   │   ├── logger/      # LogDrawer, LogFilter, LogEntry, AttachLogsModal
-│   │   ├── panels/      # NotesPanel, MarkdownPanel, MarkdownFileRow, ChecklistPanel
+│   │   ├── panels/      # NotesPanel, MarkdownPanel, MarkdownFileRow, ChecklistPanel, TasksPanel, TaskCard, TaskCardExpanded
 │   │   └── shared/      # ActionButton, AttachmentThumb, ImageAnnotator (7 tools: pen, line, arrow, rect, circle, text, move)
 │   ├── lib/types.ts     # TabState, TabAction, LogFilter, InputMode
 │   └── styles/          # tokens.css, global.css, fonts.css
-├── shared/              # IPC channels (38 channels) + types (9 exports)
-└── preload/             # contextBridge API (39+ methods across 13 namespaces)
+├── shared/              # IPC channels (40 channels) + types (9 exports)
+└── preload/             # contextBridge API (41+ methods across 14 namespaces)
 ```
 
 ## Building & Distribution

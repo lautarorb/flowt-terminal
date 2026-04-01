@@ -117,6 +117,15 @@ export function registerIpcHandlers(
     store.set('checklists', data);
   });
 
+  // Tasks
+  ipcMain.handle(IPC.TASKS_LOAD, () => {
+    return store.get('tasks', '{"lists":[],"tasks":[]}') as string;
+  });
+
+  ipcMain.on(IPC.TASKS_SAVE, (_event, data: string) => {
+    store.set('tasks', data);
+  });
+
   ipcMain.on(IPC.NOTES_SAVE, (_event, content: string) => {
     store.set('notes', content);
   });

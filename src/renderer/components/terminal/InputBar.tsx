@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, forwardRef, useImperativeHandle, Keyboar
 import AttachmentThumb from '../shared/AttachmentThumb';
 
 export interface InputBarHandle {
-  appendText: (text: string) => void;
+  appendText: (text: string, label?: string) => void;
   addImage: (dataUrl: string) => void;
 }
 
@@ -12,7 +12,7 @@ interface Props {
 
 const MAX_VISIBLE_LINES = 10;
 
-function CollapsibleText({ text, onRemove }: { text: string; onRemove: () => void }) {
+function CollapsibleText({ text, label, onRemove }: { text: string; label?: string; onRemove: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const lines = text.split('\n');
   const needsCollapse = lines.length > MAX_VISIBLE_LINES;
@@ -32,7 +32,7 @@ function CollapsibleText({ text, onRemove }: { text: string; onRemove: () => voi
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <span style={{ color: 'var(--accent-cyan)', fontSize: 'var(--font-size-sm)', fontWeight: 600 }}>
-          attached logs ({lines.length} lines)
+          {label || 'attached logs'} ({lines.length} lines)
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
           {needsCollapse && (
@@ -84,12 +84,12 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [textAttachments, setTextAttachments] = useState<string[]>([]);
+  const [textAttachments, setTextAttachments] = useState<{ text: string; label?: string }[]>([]);
   const chatRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(ref, () => ({
-    appendText: (text: string) => {
-      setTextAttachments((prev) => [...prev, text]);
+    appendText: (text: string, label?: string) => {
+      setTextAttachments((prev) => [...prev, { text, label }]);
       chatRef.current?.focus();
     },
     addImage: (dataUrl: string) => {
@@ -107,9 +107,9 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
       parts.push(text);
     }
 
-    // Add text attachments (logs etc.)
+    // Add text attachments (logs, task details, etc.)
     for (const ta of textAttachments) {
-      parts.push(ta);
+      parts.push(ta.text);
     }
 
     // Save images to temp files and add paths
@@ -141,7 +141,7 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
         for (let i = 0; i < parts.length; i++) {
           const prefix = i === 0 ? '' : ' ';
           window.vibeAPI.pty.write(tabId, prefix + parts[i]);
-          await delay(150);
+          await delay(300);
         }
         await delay(200);
         window.vibeAPI.pty.write(tabId, '\r');
@@ -260,7 +260,8 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
       {textAttachments.map((ta, i) => (
         <CollapsibleText
           key={i}
-          text={ta}
+          text={ta.text}
+          label={ta.label}
           onRemove={() => setTextAttachments((prev) => prev.filter((_, j) => j !== i))}
         />
       ))}

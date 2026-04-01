@@ -56,4 +56,8 @@ export const IPC = {
   // Checklists
   CHECKLISTS_LOAD: 'checklists:load',
   CHECKLISTS_SAVE: 'checklists:save',
+
+  // Tasks
+  TASKS_LOAD: 'tasks:load',
+  TASKS_SAVE: 'tasks:save',
 } as const;
