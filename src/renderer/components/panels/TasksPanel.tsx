@@ -37,6 +37,7 @@ interface Props {
   onRemoveImage: (taskId: string, index: number) => void;
   onUpdateImage: (taskId: string, index: number, dataUrl: string) => void;
   onClearDone: (listId: string) => void;
+  onImportCsv: (listId: string) => Promise<number>;
   onSendToTerminal: (text: string, images: string[]) => void;
   getFilteredTasks: (listId: string, status: TaskStatus) => Task[];
   getStatusCounts: (listId: string) => Record<TaskStatus, number>;
@@ -62,6 +63,7 @@ export default function TasksPanel({
   onRemoveImage,
   onUpdateImage,
   onClearDone,
+  onImportCsv,
   onSendToTerminal,
   getFilteredTasks,
   getStatusCounts,
@@ -251,27 +253,48 @@ export default function TasksPanel({
           </div>
         </div>
 
-        {/* Add task button */}
-        <div
-          onClick={handleAddTask}
-          style={{
-            padding: '4px 8px',
-            cursor: activeListId ? 'pointer' : 'default',
-            flexShrink: 0,
-          }}
-        >
-          <span
+        {/* Import CSV + Add task buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <div
+            onClick={() => { if (activeListId) onImportCsv(activeListId); }}
             style={{
-              color: activeListId ? 'var(--accent-green)' : 'var(--text-muted)',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 12,
-              fontWeight: 500,
+              padding: '4px 6px',
+              cursor: activeListId ? 'pointer' : 'default',
             }}
-            onMouseEnter={(e) => { if (activeListId) e.currentTarget.style.opacity = '0.8'; }}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+            title="Import tasks from CSV"
           >
-            [+]
-          </span>
+            <span
+              style={{
+                color: activeListId ? 'var(--text-muted)' : 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--font-size-sm)',
+              }}
+              onMouseEnter={(e) => { if (activeListId) e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            >
+              csv
+            </span>
+          </div>
+          <div
+            onClick={handleAddTask}
+            style={{
+              padding: '4px 8px',
+              cursor: activeListId ? 'pointer' : 'default',
+            }}
+          >
+            <span
+              style={{
+                color: activeListId ? 'var(--accent-green)' : 'var(--text-muted)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+                fontWeight: 500,
+              }}
+              onMouseEnter={(e) => { if (activeListId) e.currentTarget.style.opacity = '0.8'; }}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+            >
+              [+]
+            </span>
+          </div>
         </div>
       </div>
 

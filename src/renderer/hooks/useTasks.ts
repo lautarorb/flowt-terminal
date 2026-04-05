@@ -36,6 +36,36 @@ function uid(): string {
 
 const EMPTY_STORE: TaskStore = { lists: [], tasks: [] };
 
+function parseCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        result.push(current);
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+  }
+  result.push(current);
+  return result;
+}
+
 export function useTasks() {
   const [store, setStore] = useState<TaskStore>(EMPTY_STORE);
   const [activeListId, setActiveListId] = useState<string | null>(null);
@@ -227,6 +257,66 @@ export function useTasks() {
     }));
   }, []);
 
+  // --- Import from CSV ---
+
+  const importTasksFromCsv = useCallback(async (listId: string): Promise<number> => {
+    const csv = await window.vibeAPI.tasks.importCsv();
+    if (!csv) return 0;
+
+    const lines = csv.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+    if (lines.length < 2) return 0; // need header + at least one row
+
+    // Parse header to find column indices
+    const header = parseCsvLine(lines[0]).map((h) => h.toLowerCase().trim());
+    const titleIdx = header.findIndex((h) => h === 'title' || h === 'name' || h === 'task');
+    const bodyIdx = header.findIndex((h) => h === 'body' || h === 'description' || h === 'details' || h === 'notes');
+    const statusIdx = header.findIndex((h) => h === 'status' || h === 'state');
+
+    if (titleIdx === -1) return 0; // must have a title column
+
+    const validStatuses: Record<string, TaskStatus> = {
+      'ideas': 'ideas', 'idea': 'ideas',
+      'todo': 'todo', 'to do': 'todo', 'to-do': 'todo',
+      'in progress': 'in_progress', 'in_progress': 'in_progress', 'inprogress': 'in_progress', 'wip': 'in_progress',
+      'done': 'done', 'complete': 'done', 'completed': 'done',
+    };
+
+    const newTasks: Task[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = parseCsvLine(lines[i]);
+      const title = cols[titleIdx]?.trim();
+      if (!title) continue;
+
+      const rawStatus = statusIdx >= 0 ? cols[statusIdx]?.trim().toLowerCase() : '';
+      const status: TaskStatus = validStatuses[rawStatus] || activeFilter;
+
+      newTasks.push({
+        id: uid(),
+        listId,
+        title,
+        body: bodyIdx >= 0 ? (cols[bodyIdx]?.trim() || '') : '',
+        status,
+        images: [],
+        comments: [],
+        order: i - 1,
+      });
+    }
+
+    if (newTasks.length === 0) return 0;
+
+    setStore((prev) => {
+      // Offset orders by existing task count per status
+      const adjusted = newTasks.map((t) => {
+        const existing = prev.tasks.filter((e) => e.listId === listId && e.status === t.status);
+        const maxOrder = existing.length > 0 ? Math.max(...existing.map((e) => e.order)) + 1 : 0;
+        return { ...t, order: t.order + maxOrder };
+      });
+      return { ...prev, tasks: [...prev.tasks, ...adjusted] };
+    });
+
+    return newTasks.length;
+  }, [activeFilter]);
+
   // --- Clear done ---
 
   const clearDone = useCallback((listId: string) => {
@@ -270,7 +360,7 @@ export function useTasks() {
     // Images
     addImage, removeImage, updateImage,
     // Bulk
-    clearDone,
+    clearDone, importTasksFromCsv,
     // Derived
     getFilteredTasks, getStatusCounts, getNonDoneCount,
   };

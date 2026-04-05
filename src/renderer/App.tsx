@@ -30,7 +30,7 @@ export default function App() {
     setTaskStatus, toggleDone: toggleTaskDone, reorderTask,
     addComment: addTaskComment,
     addImage: addTaskImage, removeImage: removeTaskImage, updateImage: updateTaskImage,
-    clearDone: clearTaskDone,
+    clearDone: clearTaskDone, importTasksFromCsv,
     getFilteredTasks, getStatusCounts, getNonDoneCount,
   } = useTasks();
   const [mdOpen, setMdOpen] = useState(false);
@@ -203,6 +203,7 @@ export default function App() {
           onTaskRemoveImage={removeTaskImage}
           onTaskUpdateImage={updateTaskImage}
           onTaskClearDone={clearTaskDone}
+          onTaskImportCsv={importTasksFromCsv}
           onTaskSendToTerminal={handleTaskSendToTerminal}
           taskGetFilteredTasks={getFilteredTasks}
           taskGetStatusCounts={getStatusCounts}

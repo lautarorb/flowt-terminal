@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, app } from 'electron';
+import { ipcMain, BrowserWindow, app, dialog } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { IPC } from '../shared/ipc-channels';
@@ -124,6 +124,17 @@ export function registerIpcHandlers(
 
   ipcMain.on(IPC.TASKS_SAVE, (_event, data: string) => {
     store.set('tasks', data);
+  });
+
+  ipcMain.handle(IPC.TASKS_IMPORT_CSV, async () => {
+    const result = await dialog.showOpenDialog(window, {
+      title: 'Import Tasks from CSV',
+      filters: [{ name: 'CSV Files', extensions: ['csv'] }],
+      properties: ['openFile'],
+    });
+    if (result.canceled || result.filePaths.length === 0) return null;
+    const content = await fs.promises.readFile(result.filePaths[0], 'utf8');
+    return content;
   });
 
   ipcMain.on(IPC.NOTES_SAVE, (_event, content: string) => {

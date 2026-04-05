@@ -67,6 +67,7 @@ const vibeAPI = {
   tasks: {
     load: () => ipcRenderer.invoke(IPC.TASKS_LOAD) as Promise<string>,
     save: (data: string) => ipcRenderer.send(IPC.TASKS_SAVE, data),
+    importCsv: () => ipcRenderer.invoke(IPC.TASKS_IMPORT_CSV) as Promise<string | null>,
   },
 
   mdFiles: {
