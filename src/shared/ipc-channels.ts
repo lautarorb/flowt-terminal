@@ -60,5 +60,4 @@ export const IPC = {
   // Tasks
   TASKS_LOAD: 'tasks:load',
   TASKS_SAVE: 'tasks:save',
-  TASKS_IMPORT_CSV: 'tasks:import-csv',
 } as const;

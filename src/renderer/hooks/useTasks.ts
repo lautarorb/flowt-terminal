@@ -261,10 +261,7 @@ export function useTasks() {
 
   // --- Import from CSV ---
 
-  const importTasksFromCsv = useCallback(async (listId: string): Promise<number> => {
-    const csv = await window.vibeAPI.tasks.importCsv();
-    if (!csv) return 0;
-
+  const importTasksFromCsv = useCallback((listId: string, csv: string): number => {
     const lines = csv.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
     if (lines.length < 2) return 0; // need header + at least one row
 

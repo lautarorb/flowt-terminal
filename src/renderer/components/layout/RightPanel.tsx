@@ -47,7 +47,7 @@ interface Props {
   onTaskRemoveImage: (taskId: string, index: number) => void;
   onTaskUpdateImage: (taskId: string, index: number, dataUrl: string) => void;
   onTaskClearDone: (listId: string) => void;
-  onTaskImportCsv: (listId: string) => Promise<number>;
+  onTaskImportCsv: (listId: string, csv: string) => number;
   onTaskSendToTerminal: (text: string, images: string[]) => void;
   taskGetFilteredTasks: (listId: string, status: TaskStatus) => Task[];
   taskGetStatusCounts: (listId: string) => Record<TaskStatus, number>;

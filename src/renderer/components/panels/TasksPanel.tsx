@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, DragEvent } from 'react';
 import TaskCard from './TaskCard';
+import ImportTasksModal from './ImportTasksModal';
 import type { Task, TaskStatus } from '../../hooks/useTasks';
 import type { TaskList, TaskStore } from '../../hooks/useTasks';
 
@@ -37,7 +38,7 @@ interface Props {
   onRemoveImage: (taskId: string, index: number) => void;
   onUpdateImage: (taskId: string, index: number, dataUrl: string) => void;
   onClearDone: (listId: string) => void;
-  onImportCsv: (listId: string) => Promise<number>;
+  onImportCsv: (listId: string, csv: string) => number;
   onSendToTerminal: (text: string, images: string[]) => void;
   getFilteredTasks: (listId: string, status: TaskStatus) => Task[];
   getStatusCounts: (listId: string) => Record<TaskStatus, number>;
@@ -74,6 +75,7 @@ export default function TasksPanel({
   const [dragTaskId, setDragTaskId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
   const [confirmClearDone, setConfirmClearDone] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const tabsScrollRef = useRef<HTMLDivElement>(null);
 
   const tasks = activeListId ? getFilteredTasks(activeListId, activeFilter) : [];
@@ -253,10 +255,10 @@ export default function TasksPanel({
           </div>
         </div>
 
-        {/* Import CSV + Add task buttons */}
+        {/* Import + Add task buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           <div
-            onClick={() => { if (activeListId) onImportCsv(activeListId); }}
+            onClick={() => { if (activeListId) setImportModalOpen(true); }}
             style={{
               padding: '4px 6px',
               cursor: activeListId ? 'pointer' : 'default',
@@ -272,7 +274,7 @@ export default function TasksPanel({
               onMouseEnter={(e) => { if (activeListId) e.currentTarget.style.color = 'var(--text-secondary)'; }}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
             >
-              csv
+              Import
             </span>
           </div>
           <div
@@ -475,6 +477,17 @@ export default function TasksPanel({
           </div>
         ))}
       </div>
+
+      {/* Import modal */}
+      {importModalOpen && activeListId && (
+        <ImportTasksModal
+          onImport={(csv) => {
+            onImportCsv(activeListId, csv);
+            setImportModalOpen(false);
+          }}
+          onCancel={() => setImportModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
