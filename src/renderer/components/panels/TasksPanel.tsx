@@ -27,7 +27,7 @@ interface Props {
   onRemoveList: (id: string) => void;
   onRenameList: (id: string, name: string) => void;
   onAddTask: (listId: string, status?: TaskStatus) => string;
-  onUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'images' | 'order'>>) => void;
+  onUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'category' | 'images' | 'order'>>) => void;
   onDeleteTask: (taskId: string) => void;
   onSetTaskStatus: (taskId: string, status: TaskStatus) => void;
   onToggleDone: (taskId: string) => void;
@@ -330,27 +330,61 @@ export default function TasksPanel({
           </div>
         ) : (
           <>
-            {tasks.map((task, index) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onToggleDone={() => onToggleDone(task.id)}
-                onUpdateTitle={(title) => onUpdateTask(task.id, { title })}
-                onUpdateBody={(body) => onUpdateTask(task.id, { body })}
-                onDelete={() => onDeleteTask(task.id)}
-                onAddImage={(dataUrl) => onAddImage(task.id, dataUrl)}
-                onRemoveImage={(i) => onRemoveImage(task.id, i)}
-                onUpdateImage={(i, dataUrl) => onUpdateImage(task.id, i, dataUrl)}
-                onAddComment={(text) => onAddComment(task.id, text)}
-                onSendToTerminal={onSendToTerminal}
-                onSetStatus={(status) => onSetTaskStatus(task.id, status)}
-                onDragStart={(e) => handleCardDragStart(e, task.id)}
-                onDragOver={(e) => handleCardDragOver(e, task.id)}
-                onDrop={(e) => handleCardDrop(e, task, index)}
-                autoFocusTitle={task.id === newTaskId}
-                defaultExpanded={task.id === newTaskId}
-              />
-            ))}
+            {(() => {
+              // Group tasks by category
+              const groups: { category: string; tasks: Task[] }[] = [];
+              const seen = new Map<string, Task[]>();
+              for (const task of tasks) {
+                const cat = task.category || '';
+                if (!seen.has(cat)) {
+                  const arr: Task[] = [];
+                  seen.set(cat, arr);
+                  groups.push({ category: cat, tasks: arr });
+                }
+                seen.get(cat)!.push(task);
+              }
+              const hasCategories = groups.some((g) => g.category !== '');
+
+              return groups.map((group) => (
+                <div key={group.category || '__uncategorized'}>
+                  {hasCategories && group.category && (
+                    <div style={{
+                      padding: '6px 12px 2px',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 'var(--font-size-sm)',
+                      fontWeight: 600,
+                      borderBottom: '1px solid var(--border)',
+                      background: 'var(--bg-secondary)',
+                    }}>
+                      // {group.category}
+                    </div>
+                  )}
+                  {group.tasks.map((task, index) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onToggleDone={() => onToggleDone(task.id)}
+                      onUpdateTitle={(title) => onUpdateTask(task.id, { title })}
+                      onUpdateBody={(body) => onUpdateTask(task.id, { body })}
+                      onUpdateCategory={(category) => onUpdateTask(task.id, { category })}
+                      onDelete={() => onDeleteTask(task.id)}
+                      onAddImage={(dataUrl) => onAddImage(task.id, dataUrl)}
+                      onRemoveImage={(i) => onRemoveImage(task.id, i)}
+                      onUpdateImage={(i, dataUrl) => onUpdateImage(task.id, i, dataUrl)}
+                      onAddComment={(text) => onAddComment(task.id, text)}
+                      onSendToTerminal={onSendToTerminal}
+                      onSetStatus={(status) => onSetTaskStatus(task.id, status)}
+                      onDragStart={(e) => handleCardDragStart(e, task.id)}
+                      onDragOver={(e) => handleCardDragOver(e, task.id)}
+                      onDrop={(e) => handleCardDrop(e, task, index)}
+                      autoFocusTitle={task.id === newTaskId}
+                      defaultExpanded={task.id === newTaskId}
+                    />
+                  ))}
+                </div>
+              ));
+            })()}
 
             {/* Clear done button */}
             {activeFilter === 'done' && tasks.length > 0 && activeListId && (

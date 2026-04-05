@@ -14,6 +14,7 @@ export interface Task {
   title: string;
   body: string;
   status: TaskStatus;
+  category: string;
   images: string[];
   comments: TaskComment[];
   order: number;
@@ -145,6 +146,7 @@ export function useTasks() {
       title: '',
       body: '',
       status: status || activeFilter,
+      category: '',
       images: [],
       comments: [],
       order,
@@ -153,7 +155,7 @@ export function useTasks() {
     return id;
   }, [store.tasks, activeFilter]);
 
-  const updateTask = useCallback((taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'images' | 'order'>>) => {
+  const updateTask = useCallback((taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'category' | 'images' | 'order'>>) => {
     setStore((prev) => ({
       ...prev,
       tasks: prev.tasks.map((t) => t.id === taskId ? { ...t, ...updates } : t),
@@ -271,6 +273,7 @@ export function useTasks() {
     const titleIdx = header.findIndex((h) => h === 'title' || h === 'name' || h === 'task');
     const bodyIdx = header.findIndex((h) => h === 'body' || h === 'description' || h === 'details' || h === 'notes');
     const statusIdx = header.findIndex((h) => h === 'status' || h === 'state');
+    const categoryIdx = header.findIndex((h) => h === 'category' || h === 'group' || h === 'tag');
 
     if (titleIdx === -1) return 0; // must have a title column
 
@@ -296,6 +299,7 @@ export function useTasks() {
         title,
         body: bodyIdx >= 0 ? (cols[bodyIdx]?.trim() || '') : '',
         status,
+        category: categoryIdx >= 0 ? (cols[categoryIdx]?.trim() || '') : '',
         images: [],
         comments: [],
         order: i - 1,

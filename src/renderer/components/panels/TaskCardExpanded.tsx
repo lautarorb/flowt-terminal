@@ -29,6 +29,7 @@ interface Props {
   task: Task;
   onUpdateTitle: (title: string) => void;
   onUpdateBody: (body: string) => void;
+  onUpdateCategory: (category: string) => void;
   onAddImage: (dataUrl: string) => void;
   onRemoveImage: (index: number) => void;
   onUpdateImage: (index: number, dataUrl: string) => void;
@@ -41,6 +42,7 @@ export default function TaskCardExpanded({
   task,
   onUpdateTitle,
   onUpdateBody,
+  onUpdateCategory,
   onAddImage,
   onRemoveImage,
   onUpdateImage,
@@ -181,6 +183,25 @@ export default function TaskCardExpanded({
             fontFamily: 'var(--font-mono)',
             fontSize: 12,
             fontWeight: 500,
+          }}
+        />
+      </div>
+
+      {/* Category input */}
+      <div style={{ padding: '0 12px 4px 36px' }}>
+        <input
+          value={task.category}
+          onChange={(e) => onUpdateCategory(e.target.value)}
+          placeholder="category..."
+          style={{
+            width: '100%',
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            color: 'var(--text-muted)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10,
+            fontStyle: 'italic',
           }}
         />
       </div>

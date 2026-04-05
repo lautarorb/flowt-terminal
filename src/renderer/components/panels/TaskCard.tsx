@@ -14,6 +14,7 @@ interface Props {
   onToggleDone: () => void;
   onUpdateTitle: (title: string) => void;
   onUpdateBody: (body: string) => void;
+  onUpdateCategory: (category: string) => void;
   onDelete: () => void;
   onAddImage: (dataUrl: string) => void;
   onRemoveImage: (index: number) => void;
@@ -33,6 +34,7 @@ export default function TaskCard({
   onToggleDone,
   onUpdateTitle,
   onUpdateBody,
+  onUpdateCategory,
   onDelete,
   onAddImage,
   onRemoveImage,
@@ -252,6 +254,7 @@ export default function TaskCard({
           task={task}
           onUpdateTitle={onUpdateTitle}
           onUpdateBody={onUpdateBody}
+          onUpdateCategory={onUpdateCategory}
           onAddImage={onAddImage}
           onRemoveImage={onRemoveImage}
           onUpdateImage={onUpdateImage}

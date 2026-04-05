@@ -37,7 +37,7 @@ interface Props {
   onTaskRemoveList: (id: string) => void;
   onTaskRenameList: (id: string, name: string) => void;
   onTaskAddTask: (listId: string, status?: TaskStatus) => string;
-  onTaskUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'images' | 'order'>>) => void;
+  onTaskUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'category' | 'images' | 'order'>>) => void;
   onTaskDeleteTask: (taskId: string) => void;
   onTaskSetTaskStatus: (taskId: string, status: TaskStatus) => void;
   onTaskToggleDone: (taskId: string) => void;
