@@ -8,6 +8,9 @@ import { CdpLogger } from './cdp-logger';
 import { FileWatcher } from './file-watcher';
 import { ClaudeView } from './claude-view';
 import { DevicePreset, PreviewBounds } from '../shared/types';
+import { parseTaskMd } from './task-md-parser';
+import { serializeTaskMd } from './task-md-writer';
+import type { MdTaskFile } from './task-md-parser';
 import Store from 'electron-store';
 
 const store = new Store() as any;
@@ -117,13 +120,80 @@ export function registerIpcHandlers(
     store.set('checklists', data);
   });
 
-  // Tasks
-  ipcMain.handle(IPC.TASKS_LOAD, () => {
-    return store.get('tasks', '{"lists":[],"tasks":[]}') as string;
+  // Tasks (MD file persistence)
+  const TASKS_FILENAME = 'project-implementation.md';
+  let tasksWatcher: ReturnType<typeof import('chokidar').watch> | null = null;
+  let tasksWatchCwd = '';
+  let tasksWriteInProgress = false;
+
+  ipcMain.handle(IPC.TASKS_MD_LOAD, async (_event, tabId: string) => {
+    const cwd = ptyManager.getCwd(tabId);
+    const filePath = path.join(cwd, TASKS_FILENAME);
+    try {
+      const content = await fs.promises.readFile(filePath, 'utf8');
+      const parsed = parseTaskMd(content);
+      return JSON.stringify({ status: 'ok', data: parsed, cwd });
+    } catch (err: any) {
+      if (err.code === 'ENOENT') {
+        return JSON.stringify({ status: 'not_found', data: null, cwd });
+      }
+      return JSON.stringify({ status: 'error', error: err.message, cwd });
+    }
   });
 
-  ipcMain.on(IPC.TASKS_SAVE, (_event, data: string) => {
-    store.set('tasks', data);
+  ipcMain.on(IPC.TASKS_MD_SAVE, async (_event, tabId: string, data: string) => {
+    const cwd = ptyManager.getCwd(tabId);
+    const filePath = path.join(cwd, TASKS_FILENAME);
+    const tmpPath = filePath + '.tmp';
+    try {
+      tasksWriteInProgress = true;
+      const file: MdTaskFile = JSON.parse(data);
+      const content = serializeTaskMd(file);
+      await fs.promises.writeFile(tmpPath, content, 'utf8');
+      await fs.promises.rename(tmpPath, filePath);
+      emitVerbose(window, `Tasks: saved ${file.tasks.length} tasks to ${filePath}`);
+    } catch (err: any) {
+      emitVerbose(window, `Tasks: write failed — ${err.message}`);
+      // Clean up tmp file if rename failed
+      try { await fs.promises.unlink(tmpPath); } catch { /* ignore */ }
+    } finally {
+      // Delay resetting the flag to let chokidar event pass
+      setTimeout(() => { tasksWriteInProgress = false; }, 500);
+    }
+  });
+
+  ipcMain.handle(IPC.TASKS_MD_WATCH, async (_event, tabId: string) => {
+    const cwd = ptyManager.getCwd(tabId);
+    if (tasksWatchCwd === cwd && tasksWatcher) return true;
+
+    // Close previous watcher
+    if (tasksWatcher) { tasksWatcher.close(); tasksWatcher = null; }
+    tasksWatchCwd = cwd;
+
+    const chokidar = await import('chokidar');
+    tasksWatcher = chokidar.watch(TASKS_FILENAME, {
+      cwd,
+      persistent: true,
+      ignoreInitial: true,
+    });
+
+    tasksWatcher.on('change', async () => {
+      // Skip if we just wrote the file ourselves
+      if (tasksWriteInProgress) return;
+      try {
+        const filePath = path.join(cwd, TASKS_FILENAME);
+        const content = await fs.promises.readFile(filePath, 'utf8');
+        const parsed = parseTaskMd(content);
+        if (!window.isDestroyed()) {
+          window.webContents.send(IPC.TASKS_MD_CHANGED, JSON.stringify(parsed));
+        }
+        emitVerbose(window, `Tasks: external change detected, re-parsed`);
+      } catch (err: any) {
+        emitVerbose(window, `Tasks: failed to re-parse after external change — ${err.message}`);
+      }
+    });
+
+    return true;
   });
 
 

@@ -57,7 +57,9 @@ export const IPC = {
   CHECKLISTS_LOAD: 'checklists:load',
   CHECKLISTS_SAVE: 'checklists:save',
 
-  // Tasks
-  TASKS_LOAD: 'tasks:load',
-  TASKS_SAVE: 'tasks:save',
+  // Tasks (MD file persistence)
+  TASKS_MD_LOAD: 'tasks:md-load',
+  TASKS_MD_SAVE: 'tasks:md-save',
+  TASKS_MD_WATCH: 'tasks:md-watch',
+  TASKS_MD_CHANGED: 'tasks:md-changed',
 } as const;

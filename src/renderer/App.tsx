@@ -22,17 +22,17 @@ export default function App() {
     toggle: toggleChecklists, close: closeChecklists,
   } = useChecklists();
   const {
-    store: taskStore,
-    activeListId: taskActiveListId, setActiveListId: setTaskActiveListId,
+    state: taskState, loadStatus: taskLoadStatus, errorMessage: taskErrorMessage,
     activeFilter: taskActiveFilter, setActiveFilter: setTaskActiveFilter,
-    addList: addTaskList, removeList: removeTaskList, renameList: renameTaskList,
+    reload: reloadTasks,
     addTask, updateTask, deleteTask,
     setTaskStatus, toggleDone: toggleTaskDone, reorderTask,
-    addComment: addTaskComment,
+    addComment: addTaskComment, addFeedback: addTaskFeedback,
     addImage: addTaskImage, removeImage: removeTaskImage, updateImage: updateTaskImage,
     clearDone: clearTaskDone, importTasksFromCsv,
+    markSentToTerminal,
     getFilteredTasks, getStatusCounts, getNonDoneCount,
-  } = useTasks();
+  } = useTasks(activeTabId);
   const [mdOpen, setMdOpen] = useState(false);
   const inputBarRef = useRef<InputBarHandle>(null);
 
@@ -184,14 +184,11 @@ export default function App() {
           clearLogs={clearLogs}
           onAttachLogs={handleAttachLogs}
           onAttachScreenshot={handleAttachScreenshot}
-          taskStore={taskStore}
-          taskActiveListId={taskActiveListId}
+          taskState={taskState}
+          taskLoadStatus={taskLoadStatus}
+          taskErrorMessage={taskErrorMessage}
           taskActiveFilter={taskActiveFilter}
-          onTaskSetActiveListId={setTaskActiveListId}
           onTaskSetActiveFilter={setTaskActiveFilter}
-          onTaskAddList={addTaskList}
-          onTaskRemoveList={removeTaskList}
-          onTaskRenameList={renameTaskList}
           onTaskAddTask={addTask}
           onTaskUpdateTask={updateTask}
           onTaskDeleteTask={deleteTask}
@@ -199,12 +196,15 @@ export default function App() {
           onTaskToggleDone={toggleTaskDone}
           onTaskReorderTask={reorderTask}
           onTaskAddComment={addTaskComment}
+          onTaskAddFeedback={addTaskFeedback}
           onTaskAddImage={addTaskImage}
           onTaskRemoveImage={removeTaskImage}
           onTaskUpdateImage={updateTaskImage}
           onTaskClearDone={clearTaskDone}
           onTaskImportCsv={importTasksFromCsv}
           onTaskSendToTerminal={handleTaskSendToTerminal}
+          onTaskMarkSentToTerminal={markSentToTerminal}
+          onTaskReload={reloadTasks}
           taskGetFilteredTasks={getFilteredTasks}
           taskGetStatusCounts={getStatusCounts}
           taskNonDoneCount={getNonDoneCount()}

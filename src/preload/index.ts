@@ -65,8 +65,11 @@ const vibeAPI = {
   },
 
   tasks: {
-    load: () => ipcRenderer.invoke(IPC.TASKS_LOAD) as Promise<string>,
-    save: (data: string) => ipcRenderer.send(IPC.TASKS_SAVE, data),
+    loadMd: (tabId: string) => ipcRenderer.invoke(IPC.TASKS_MD_LOAD, tabId) as Promise<string>,
+    saveMd: (tabId: string, data: string) => ipcRenderer.send(IPC.TASKS_MD_SAVE, tabId, data),
+    watchMd: (tabId: string) => ipcRenderer.invoke(IPC.TASKS_MD_WATCH, tabId),
+    onMdChanged: (cb: (data: string) => void) =>
+      on(IPC.TASKS_MD_CHANGED, (_e: any, data: string) => cb(data)),
   },
 
   mdFiles: {

@@ -14,17 +14,6 @@ function highlightKeywords(text: string): string {
     .replace(/(`[^`]+`)/g, '<span style="color: #06B6D4">$1</span>');
 }
 
-function formatTimestamp(ts: number): string {
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
 interface Props {
   task: Task;
   onUpdateTitle: (title: string) => void;
@@ -34,6 +23,7 @@ interface Props {
   onRemoveImage: (index: number) => void;
   onUpdateImage: (index: number, dataUrl: string) => void;
   onAddComment: (text: string) => void;
+  onAddFeedback: (text: string) => void;
   onSendToTerminal: (text: string, images: string[]) => void;
   autoFocusTitle?: boolean;
 }
@@ -47,11 +37,14 @@ export default function TaskCardExpanded({
   onRemoveImage,
   onUpdateImage,
   onAddComment,
+  onAddFeedback,
   onSendToTerminal,
   autoFocusTitle,
 }: Props) {
   const [sendComments, setSendComments] = useState(false);
+  const [sendFeedback, setSendFeedback] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [feedbackText, setFeedbackText] = useState('');
   const titleRef = useRef<HTMLInputElement>(null);
   const bodyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const bodyOverlayRef = useRef<HTMLPreElement>(null);
@@ -68,10 +61,7 @@ export default function TaskCardExpanded({
   }, []);
 
   const handleTitleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      bodyTextareaRef.current?.focus();
-    }
+    if (e.key === 'Enter') { e.preventDefault(); bodyTextareaRef.current?.focus(); }
   }, []);
 
   const handleBodyKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -115,8 +105,7 @@ export default function TaskCardExpanded({
   }, [task.body, onUpdateBody]);
 
   const handleImageDrop = useCallback((e: DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     for (const file of Array.from(e.dataTransfer.files)) {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -144,15 +133,16 @@ export default function TaskCardExpanded({
   const handleSendToTerminal = useCallback(() => {
     let text = task.title;
     if (task.body) text += '\n\n' + task.body;
+    if (sendFeedback && task.feedback.length > 0) {
+      text += '\n\n---\nFeedback:\n';
+      for (const f of task.feedback) text += `[${f.timestamp}] ${f.text}\n`;
+    }
     if (sendComments && task.comments.length > 0) {
       text += '\n\n---\nComments:\n';
-      for (const c of task.comments) {
-        const date = new Date(c.timestamp);
-        text += `[${date.toLocaleString()}] ${c.text}\n`;
-      }
+      for (const c of task.comments) text += `[${c.timestamp}] ${c.text}\n`;
     }
     onSendToTerminal(text, task.images);
-  }, [task, sendComments, onSendToTerminal]);
+  }, [task, sendComments, sendFeedback, onSendToTerminal]);
 
   const handleAddComment = useCallback(() => {
     const text = commentText.trim();
@@ -162,11 +152,29 @@ export default function TaskCardExpanded({
     requestAnimationFrame(() => commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' }));
   }, [commentText, onAddComment]);
 
+  const handleAddFeedback = useCallback(() => {
+    const text = feedbackText.trim();
+    if (!text) return;
+    onAddFeedback(text);
+    setFeedbackText('');
+  }, [feedbackText, onAddFeedback]);
+
   const bodyHeight = Math.max(80, Math.min(200, (task.body.split('\n').length + 1) * 20));
+
+  const toggleStyle = (active: boolean) => ({
+    width: 24, height: 12, borderRadius: 6,
+    background: active ? 'var(--accent-green)' : 'var(--bg-tertiary)',
+    position: 'relative' as const, transition: 'background 0.15s', cursor: 'pointer',
+  });
+
+  const knobStyle = (active: boolean) => ({
+    width: 8, height: 8, borderRadius: '50%', background: 'var(--text-primary)',
+    position: 'absolute' as const, top: 2, left: active ? 14 : 2, transition: 'left 0.15s',
+  });
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Title input */}
+      {/* Title */}
       <div style={{ padding: '0 12px 6px 36px' }}>
         <input
           ref={titleRef}
@@ -175,38 +183,26 @@ export default function TaskCardExpanded({
           onKeyDown={handleTitleKeyDown}
           placeholder="Task title..."
           style={{
-            width: '100%',
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: 'var(--text-primary)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            fontWeight: 500,
+            width: '100%', background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 500,
           }}
         />
       </div>
 
-      {/* Category input */}
+      {/* Category */}
       <div style={{ padding: '0 12px 4px 36px' }}>
         <input
           value={task.category}
           onChange={(e) => onUpdateCategory(e.target.value)}
           placeholder="category..."
           style={{
-            width: '100%',
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: 'var(--text-muted)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10,
-            fontStyle: 'italic',
+            width: '100%', background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10, fontStyle: 'italic',
           }}
         />
       </div>
 
-      {/* Body editor with overlay technique */}
+      {/* Body editor */}
       <div
         style={{ position: 'relative', height: bodyHeight, margin: '0 12px 8px 36px' }}
         onDrop={handleImageDrop}
@@ -217,17 +213,9 @@ export default function TaskCardExpanded({
           ref={bodyOverlayRef}
           dangerouslySetInnerHTML={{ __html: highlightKeywords(task.body) + '\n' }}
           style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            padding: 0, margin: 0,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            lineHeight: 1.7,
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            overflow: 'auto',
-            pointerEvents: 'none',
-            color: 'var(--text-primary)',
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, padding: 0, margin: 0,
+            fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: 1.7, whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word', overflow: 'auto', pointerEvents: 'none', color: 'var(--text-primary)',
           }}
         />
         <textarea
@@ -239,91 +227,81 @@ export default function TaskCardExpanded({
           placeholder="Add details (markdown supported)..."
           spellCheck={false}
           style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            width: '100%', height: '100%',
-            padding: 0, margin: 0,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            lineHeight: 1.7,
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            overflow: 'auto',
-            background: 'transparent',
-            color: 'transparent',
-            caretColor: 'var(--text-primary)',
-            border: 'none',
-            outline: 'none',
-            resize: 'none',
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%',
+            padding: 0, margin: 0, fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: 1.7,
+            whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflow: 'auto', background: 'transparent',
+            color: 'transparent', caretColor: 'var(--text-primary)', border: 'none', outline: 'none', resize: 'none',
           }}
         />
       </div>
 
-      {/* Image attachments */}
+      {/* Images */}
       {task.images.length > 0 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '4px 12px 8px 36px' }}>
           {task.images.map((src, i) => (
-            <AttachmentThumb
-              key={i}
-              src={src}
-              onRemove={() => onRemoveImage(i)}
-              onUpdate={(dataUrl) => onUpdateImage(i, dataUrl)}
-            />
+            <AttachmentThumb key={i} src={src} onRemove={() => onRemoveImage(i)} onUpdate={(dataUrl) => onUpdateImage(i, dataUrl)} />
           ))}
         </div>
       )}
 
-      {/* Send comments toggle + Send to terminal */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 12px 8px 36px',
-      }}>
-        <div
-          style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-          onClick={() => setSendComments((v) => !v)}
-        >
-          <div style={{
-            width: 24, height: 12, borderRadius: 6,
-            background: sendComments ? 'var(--accent-green)' : 'var(--bg-tertiary)',
-            position: 'relative', transition: 'background 0.15s',
-          }}>
-            <div style={{
-              width: 8, height: 8, borderRadius: '50%',
-              background: 'var(--text-primary)',
-              position: 'absolute', top: 2,
-              left: sendComments ? 14 : 2,
-              transition: 'left 0.15s',
-            }} />
+      {/* Toggles + Send */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 12px 8px 36px' }}>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => setSendComments((v) => !v)}>
+            <div style={toggleStyle(sendComments)}><div style={knobStyle(sendComments)} /></div>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>comments</span>
           </div>
-          <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>
-            send comments
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }} onClick={() => setSendFeedback((v) => !v)}>
+            <div style={toggleStyle(sendFeedback)}><div style={knobStyle(sendFeedback)} /></div>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>feedback</span>
+          </div>
         </div>
-
         <button
           onClick={handleSendToTerminal}
           style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '6px 12px', borderRadius: 4,
-            border: '1px solid var(--accent-green)',
-            background: 'transparent',
-            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 4,
+            border: '1px solid var(--accent-green)', background: 'transparent', cursor: 'pointer',
           }}
         >
           <span style={{ color: 'var(--accent-green)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>$&gt;</span>
-          <span style={{ color: 'var(--accent-green)', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500 }}>
-            send to terminal
-          </span>
+          <span style={{ color: 'var(--accent-green)', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 500 }}>send to terminal</span>
         </button>
       </div>
 
+      {/* Feedback divider */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 12px 0 12px' }}>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        <span style={{ color: 'var(--accent-yellow)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>feedback</span>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+      </div>
+
+      {/* Feedback list */}
+      <div style={{ padding: '4px 12px 6px 12px', maxHeight: 100, overflowY: 'auto' }}>
+        {task.feedback.map((f, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10, flexShrink: 0, lineHeight: '18px' }}>{f.timestamp}</span>
+            <span style={{ color: 'var(--accent-yellow)', fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: '18px' }}>{f.text}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Feedback input */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px 6px 12px' }}>
+        <span style={{ color: 'var(--accent-yellow)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>⚡</span>
+        <input
+          value={feedbackText}
+          onChange={(e) => setFeedbackText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeedback(); } }}
+          placeholder="add feedback..."
+          style={{
+            flex: 1, background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: 11, fontStyle: 'italic',
+          }}
+        />
+      </div>
+
       {/* Comments divider */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '4px 12px 0 12px',
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 12px 0 12px' }}>
         <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10 }}>comments</span>
         <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
@@ -331,30 +309,17 @@ export default function TaskCardExpanded({
 
       {/* Comments list */}
       <div style={{ padding: '4px 12px 6px 12px', maxHeight: 150, overflowY: 'auto' }}>
-        {task.comments.map((c) => (
-          <div key={c.id} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
-            <span style={{
-              color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10,
-              flexShrink: 0, lineHeight: '18px',
-            }}>
-              {formatTimestamp(c.timestamp)}
-            </span>
-            <span style={{
-              color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: 11,
-              lineHeight: '18px',
-            }}>
-              {c.text}
-            </span>
+        {task.comments.map((c, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4 }}>
+            <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 10, flexShrink: 0, lineHeight: '18px' }}>{c.timestamp}</span>
+            <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: 11, lineHeight: '18px' }}>{c.text}</span>
           </div>
         ))}
         <div ref={commentsEndRef} />
       </div>
 
       {/* Comment input */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        padding: '0 12px 10px 12px',
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px 10px 12px' }}>
         <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>&gt;</span>
         <input
           value={commentText}
@@ -362,14 +327,8 @@ export default function TaskCardExpanded({
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddComment(); } }}
           placeholder="add a comment..."
           style={{
-            flex: 1,
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: 'var(--text-primary)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            fontStyle: 'italic',
+            flex: 1, background: 'transparent', border: 'none', outline: 'none',
+            color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: 11, fontStyle: 'italic',
           }}
         />
       </div>

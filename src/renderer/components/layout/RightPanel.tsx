@@ -7,9 +7,10 @@ import PreviewFrame from '../preview/PreviewFrame';
 import LogDrawer from '../logger/LogDrawer';
 import AttachLogsModal from '../logger/AttachLogsModal';
 import TasksPanel from '../panels/TasksPanel';
-import type { Task, TaskStatus, TaskStore } from '../../hooks/useTasks';
+import type { Task, TaskStatus, MdTaskFileState } from '../../hooks/useTasks';
 
 type RightTab = 'preview' | 'claude' | 'tasks';
+type LoadStatus = 'loading' | 'ok' | 'not_found' | 'error' | 'parse_error';
 
 interface Props {
   url: string;
@@ -28,29 +29,29 @@ interface Props {
   onAttachLogs: (text: string) => void;
   onAttachScreenshot: () => void;
   // Tasks
-  taskStore: TaskStore;
-  taskActiveListId: string | null;
+  taskState: MdTaskFileState;
+  taskLoadStatus: LoadStatus;
+  taskErrorMessage: string;
   taskActiveFilter: TaskStatus;
-  onTaskSetActiveListId: (id: string) => void;
   onTaskSetActiveFilter: (status: TaskStatus) => void;
-  onTaskAddList: () => string;
-  onTaskRemoveList: (id: string) => void;
-  onTaskRenameList: (id: string, name: string) => void;
-  onTaskAddTask: (listId: string, status?: TaskStatus) => string;
-  onTaskUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'category' | 'images' | 'order'>>) => void;
+  onTaskAddTask: (status?: TaskStatus) => string;
+  onTaskUpdateTask: (taskId: string, updates: Partial<Pick<Task, 'title' | 'body' | 'status' | 'category'>>) => void;
   onTaskDeleteTask: (taskId: string) => void;
   onTaskSetTaskStatus: (taskId: string, status: TaskStatus) => void;
   onTaskToggleDone: (taskId: string) => void;
-  onTaskReorderTask: (taskId: string, newOrder: number) => void;
+  onTaskReorderTask: (taskId: string, newIndex: number) => void;
   onTaskAddComment: (taskId: string, text: string) => void;
+  onTaskAddFeedback: (taskId: string, text: string) => void;
   onTaskAddImage: (taskId: string, dataUrl: string) => void;
   onTaskRemoveImage: (taskId: string, index: number) => void;
   onTaskUpdateImage: (taskId: string, index: number, dataUrl: string) => void;
-  onTaskClearDone: (listId: string) => void;
-  onTaskImportCsv: (listId: string, csv: string) => number;
+  onTaskClearDone: () => void;
+  onTaskImportCsv: (csv: string) => number;
   onTaskSendToTerminal: (text: string, images: string[]) => void;
-  taskGetFilteredTasks: (listId: string, status: TaskStatus) => Task[];
-  taskGetStatusCounts: (listId: string) => Record<TaskStatus, number>;
+  onTaskMarkSentToTerminal: (taskId: string) => void;
+  onTaskReload: () => void;
+  taskGetFilteredTasks: (status: TaskStatus) => Task[];
+  taskGetStatusCounts: () => Record<TaskStatus, number>;
   taskNonDoneCount: number;
 }
 
@@ -71,14 +72,11 @@ export default function RightPanel({
   onAttachLogs,
   onAttachScreenshot,
   // Tasks
-  taskStore,
-  taskActiveListId,
+  taskState,
+  taskLoadStatus,
+  taskErrorMessage,
   taskActiveFilter,
-  onTaskSetActiveListId,
   onTaskSetActiveFilter,
-  onTaskAddList,
-  onTaskRemoveList,
-  onTaskRenameList,
   onTaskAddTask,
   onTaskUpdateTask,
   onTaskDeleteTask,
@@ -86,12 +84,15 @@ export default function RightPanel({
   onTaskToggleDone,
   onTaskReorderTask,
   onTaskAddComment,
+  onTaskAddFeedback,
   onTaskAddImage,
   onTaskRemoveImage,
   onTaskUpdateImage,
   onTaskClearDone,
   onTaskImportCsv,
   onTaskSendToTerminal,
+  onTaskMarkSentToTerminal,
+  onTaskReload,
   taskGetFilteredTasks,
   taskGetStatusCounts,
   taskNonDoneCount,
@@ -343,14 +344,11 @@ export default function RightPanel({
       {/* Tasks content */}
       <div style={{ flex: 1, display: activeTab === 'tasks' ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}>
         <TasksPanel
-          store={taskStore}
-          activeListId={taskActiveListId}
+          state={taskState}
+          loadStatus={taskLoadStatus}
+          errorMessage={taskErrorMessage}
           activeFilter={taskActiveFilter}
-          onSetActiveListId={onTaskSetActiveListId}
           onSetActiveFilter={onTaskSetActiveFilter}
-          onAddList={onTaskAddList}
-          onRemoveList={onTaskRemoveList}
-          onRenameList={onTaskRenameList}
           onAddTask={onTaskAddTask}
           onUpdateTask={onTaskUpdateTask}
           onDeleteTask={onTaskDeleteTask}
@@ -358,12 +356,15 @@ export default function RightPanel({
           onToggleDone={onTaskToggleDone}
           onReorderTask={onTaskReorderTask}
           onAddComment={onTaskAddComment}
+          onAddFeedback={onTaskAddFeedback}
           onAddImage={onTaskAddImage}
           onRemoveImage={onTaskRemoveImage}
           onUpdateImage={onTaskUpdateImage}
           onClearDone={onTaskClearDone}
           onImportCsv={onTaskImportCsv}
           onSendToTerminal={onTaskSendToTerminal}
+          onMarkSentToTerminal={onTaskMarkSentToTerminal}
+          onReload={onTaskReload}
           getFilteredTasks={taskGetFilteredTasks}
           getStatusCounts={taskGetStatusCounts}
         />
