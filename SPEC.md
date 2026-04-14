@@ -21,7 +21,7 @@ Flowt follows Electron's multi-process architecture with strict security boundar
 │  │RouteTrk. │ │  View)        │ │          │           │
 │  └──────────┘ └───────────────┘ └──────────┘           │
 │                                                         │
-│                 IPC Handlers (38 channels)               │
+│                 IPC Handlers (42 channels)               │
 └─────────────────────┬───────────────────────────────────┘
                       │ contextBridge (vibeAPI)
 ┌─────────────────────┴───────────────────────────────────┐

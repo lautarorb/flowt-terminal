@@ -35,7 +35,7 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 
 ### Claude.ai View
 - **Separate WebContentsView** for claude.ai — renders as floating overlay in the right panel
-- **Tab switching** between Preview and Claude — preview is hidden when Claude tab is active
+- **Tab switching** between Preview, Claude, and Tasks — preview is hidden when Claude or Tasks tab is active
 - **Reload button** appears next to Claude tab name when active
 - **Bounds synced** via ResizeObserver and window resize events
 
@@ -120,8 +120,8 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 | @xterm/addon-web-links | Clickable URLs in terminal output |
 | react/react-dom | UI framework |
 | fix-path | Fix $PATH in macOS GUI Electron apps |
-| electron-store | Persist notes across sessions |
-| chokidar | Watch .md files for live updates |
+| electron-store | Persist notes and checklists across sessions |
+| chokidar | Watch .md files and project-implementation.md for live updates |
 | marked | Render markdown in the MDs panel |
 | @electron-forge/maker-dmg | Build macOS DMG installer |
 
@@ -183,11 +183,16 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 - Highlights matches in the terminal buffer
 
 ### Terminal Font Zoom
-- Cmd+/Cmd- changes terminal font size only (not the entire UI)
+- Cmd+/Cmd- changes terminal and compose bar font size (CSS variable `--font-size-terminal` synced with xterm)
 - Range: 8px to 28px, default 13px
 - Cmd+0 resets to default
 - Overrides Electron's default zoom behavior via custom menu items
 - Automatically refits the terminal after font size change
+
+### App Font Zoom
+- Cmd+Option+/Cmd+Option- scales all three CSS font variables (`--font-size-terminal`, `--font-size-ui`, `--font-size-sm`)
+- Range: -4px to +8px offset from defaults
+- Cmd+Option+0 resets all to defaults
 
 ### Scroll Position Preservation
 - `fit()` saves and restores viewport position when user is scrolled up
@@ -204,6 +209,20 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 - Strips `ELECTRON_*`, `CHROME_*`, `GOOGLE_*`, and `NODE_OPTIONS` from env
 - Preserves all other env vars for MCP servers, hooks, and CLI tools
 - Sets `TERM_PROGRAM=Flowt`
+
+### Tasks Panel — MD Persistence
+- Source of truth is `project-implementation.md` in the terminal's CWD (detected via lsof)
+- **Parser** (`task-md-parser.ts`): splits by `---` separator, extracts `##` titles, `**Status:**`/`**Category:**`/`**ID:**` fields, body between ID and `### Feedback`, comment/feedback entries with timestamps
+- **Writer** (`task-md-writer.ts`): serializes tasks back to MD format, recalculates header summary counts, atomic writes (temp file → rename)
+- **File watcher**: dedicated chokidar instance on `project-implementation.md`, skips self-triggered writes via a 500ms flag
+- **CWD polling**: every 2s checks if terminal CWD changed, reloads tasks if new directory
+- **Two-way sync**: UI changes write to MD immediately (300ms debounce), external changes (Claude Code, text editors) reload the panel
+- **ID generation**: `task-001`, `task-002`, etc. — increments from highest existing ID, zero-padded to 3 digits
+- **Send to terminal**: auto-adds "Sent to terminal" comment with timestamp, changes status to `in_progress` if `todo`
+- **Feedback section**: separate from comments, yellow-accented in UI, `### Feedback` section in MD
+- **CSV import**: modal with drag-and-drop zone, downloadable template, parses title/description/status/category columns
+- **Error states**: not_found (empty message + prompt to create first task), error (message + retry button), parse_error (message)
+- 47 unit tests: 31 parser tests, 16 writer/round-trip tests
 
 ## Known Limitations
 

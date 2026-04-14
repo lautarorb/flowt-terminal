@@ -55,14 +55,20 @@ Persistent scratchpad with syntax-highlighted keywords (`todo:`, `questions:`, `
 ### Checklists Panel
 Multiple named checklists with tabs. Add items, check them off, clear done. Double-click a tab to rename. Persists across sessions.
 
+### Tasks Panel
+Third tab in the right panel. Full task management backed by a `project-implementation.md` file in your project directory — the markdown file is the single source of truth. Create tasks, edit titles and descriptions inline, change status via checkbox or drag-to-tab, add comments and feedback with timestamps, attach and annotate images, and send task details directly to the terminal compose bar. Categories group tasks visually under headers. Status filters at the bottom (Ideas, To Do, In Progress, Done) with live counts. Import tasks from CSV with a drag-and-drop modal and downloadable template. File watcher detects external changes (e.g., Claude Code updating a task status) and refreshes the panel automatically. CWD polling auto-loads tasks when you `cd` into a project.
+
 ### Claude.ai Tab
-The right panel has a second tab that embeds claude.ai directly. Reference Claude's web interface without leaving the app.
+The right panel has a tab that embeds claude.ai directly. Reference Claude's web interface without leaving the app.
 
 ### Terminal Search
 Cmd+F opens a search bar to find text in the terminal scrollback buffer. Enter for next match, Shift+Enter for previous, Escape to close.
 
 ### Terminal Font Zoom
-Cmd+/- changes terminal font size only (8px–28px) without affecting the rest of the UI. Cmd+0 resets to default 13px.
+Cmd+/- changes terminal and compose bar font size (8px–28px). Cmd+0 resets to default 13px.
+
+### App Font Zoom
+Cmd+Option+/- scales all app fonts (terminal, UI labels, small text). Cmd+Option+0 resets.
 
 ### Quick Response
 Detects y/n prompts, numbered choices, and permission requests in terminal output. Shows clickable buttons for one-tap answers.
@@ -103,8 +109,10 @@ Output: `out/make/Flowt-VERSION-arm64.dmg`
 | Cmd+1-9 | Jump to tab |
 | Cmd+Shift+[ / ] | Previous / next tab |
 | Cmd+F | Search terminal |
-| Cmd+= / Cmd+- | Zoom terminal font |
+| Cmd+= / Cmd+- | Zoom terminal + compose font |
 | Cmd+0 | Reset terminal font |
+| Cmd+Option+= / - | Zoom all app fonts |
+| Cmd+Option+0 | Reset all app fonts |
 | Ctrl+C | Send SIGINT |
 | Shift+Enter | Newline in input bar |
 | Enter | Send message |

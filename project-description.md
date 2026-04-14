@@ -8,7 +8,7 @@ The app is a single window split into two panels with a draggable divider.
 
 The left panel is the terminal. This is where Claude Code runs, where you type, where output appears. It is a full PTY terminal, same as iTerm2 or any other emulator. Nothing is intercepted, modified, or processed between you and the shell.
 
-The right panel has two tabs: Preview and Claude. The Preview tab is an embedded browser view with a URL bar, device emulation selector, action buttons, and a structured log drawer. The Claude tab embeds claude.ai directly in the app with a reload button.
+The right panel has three tabs: Preview, Claude, and Tasks. The Preview tab is an embedded browser view with a URL bar, device emulation selector, action buttons, and a structured log drawer. The Claude tab embeds claude.ai directly in the app with a reload button. The Tasks tab is a full project task manager backed by a `project-implementation.md` file in the terminal's working directory.
 
 At the bottom of the Preview tab sit two action buttons — "Add logs" and "Add screenshot" — that let you attach browser context to your next message to Claude Code. Below that is a structured log drawer, collapsible, that captures everything happening inside the embedded browser in real time.
 
@@ -44,7 +44,7 @@ Ctrl+C always sends SIGINT to the terminal regardless of where your focus is. Ar
 
 Cmd+F opens a search bar in the terminal to find text in the scrollback buffer. Enter finds next, Shift+Enter finds previous, Escape closes the search.
 
-Cmd+ and Cmd- change the terminal font size only (8px min, 28px max) without affecting the rest of the UI. Cmd+0 resets to the default 13px.
+Cmd+ and Cmd- change the terminal and compose bar font size (8px min, 28px max). Cmd+0 resets to the default 13px. Cmd+Option+ and Cmd+Option- scale all app fonts (terminal, UI labels, small text). Cmd+Option+0 resets.
 
 ## Screenshot Attach
 
@@ -81,6 +81,22 @@ A floating panel accessible from the "Notes" button in the tab bar. It is a scra
 
 A floating panel accessible from the "Checklists" button in the tab bar (between MDs and Notes). Supports multiple named checklists via tabs — double-click a tab to rename it. Add items via the input at the bottom, check them off with a click, and use "Clear done" to remove completed items. Checklists persist across sessions.
 
+## Tasks Panel
+
+The Tasks tab in the right panel is a full project task manager. The source of truth is a `project-implementation.md` file in the terminal's current working directory — the same markdown file Claude Code can read and edit directly.
+
+Tasks have a title, description (full markdown), status (Ideas/To Do/In Progress/Done), category for visual grouping, comments with timestamps, and feedback entries with timestamps. Each task has a unique ID that never changes.
+
+The panel auto-detects the project directory via CWD polling (every 2 seconds). When you `cd` into a project with a `project-implementation.md`, tasks load automatically. A file watcher detects external changes (e.g., Claude Code updating a task status to done) and refreshes the panel without a full reload.
+
+Every action writes back to the MD file immediately: creating, editing, deleting, status changes, comments, feedback. Writes are atomic (temp file then rename) to prevent corruption.
+
+Cards can be collapsed (showing title, status dot, meta indicators) or expanded (inline title edit, category, markdown body editor, image attachments, feedback section, comments section, send to terminal button). Drag cards to reorder within a status tab or drag onto a different status tab to change status. Checkbox marks a task done instantly.
+
+"Send to terminal" populates the compose bar with the task's title, description, and optionally comments and feedback. It auto-adds a timestamped comment ("Sent to terminal") and changes status to In Progress if it was To Do.
+
+CSV import via a drag-and-drop modal with a downloadable template file. Supports title, description, status, and category columns.
+
 ## Image Annotation
 
 When you click a screenshot thumbnail in the input bar, an annotation overlay opens with 7 tools: freehand pen, straight line, arrow, rectangle, circle, and text — plus move and resize. Choose from 5 stroke colors (red, green, yellow, cyan, white). Shapes scale proportionally when resized. Delete/Backspace removes selected shapes, Cmd+Z undoes. Save composites all annotations onto the original image before sending to Claude Code.
@@ -95,4 +111,4 @@ Flowt does not call the Anthropic API. It does not suggest commands, autocomplet
 
 ## Platform and Stack
 
-Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 38 IPC channels across 13 namespaces. 40 unit tests covering port detection and route tracking. Distributable as a macOS DMG installer.
+Mac only. Built with Electron 41, React 19, TypeScript 5.4, node-pty for terminal emulation, xterm.js 6 for terminal rendering, and Electron Forge with webpack for building. The preview uses Electron's WebContentsView with Chrome DevTools Protocol for log capture. 128 device presets for responsive testing. 42 IPC channels across 14 namespaces. 95 unit tests covering port detection, route tracking, task MD parsing (31 tests), and task MD writing with round-trip fidelity (16 tests). Distributable as a macOS DMG installer.
