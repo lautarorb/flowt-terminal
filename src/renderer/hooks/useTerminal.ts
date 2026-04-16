@@ -39,11 +39,15 @@ export function useTerminal({ tabId, isActive, onData }: UseTerminalOptions) {
         window.vibeAPI.pty.resize(tabId, term.cols, term.rows);
       }
 
-      // Restore scroll position if user was reading above
+      // Restore scroll position
       if (wasScrolledUp && distFromBottom > 0) {
+        // User was reading history — keep same distance from bottom
         const newBuf = term.buffer.active;
         const targetLine = Math.max(0, newBuf.baseY - distFromBottom);
         term.scrollToLine(targetLine);
+      } else {
+        // User was at bottom — stay at bottom
+        term.scrollToBottom();
       }
     } catch {
       // Ignore fit errors

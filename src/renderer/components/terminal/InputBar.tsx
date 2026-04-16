@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, forwardRef, useImperativeHandle, KeyboardEvent, DragEvent, ClipboardEvent } from 'react';
+import { useState, useRef, useCallback, forwardRef, useImperativeHandle, KeyboardEvent, DragEvent, ClipboardEvent, useEffect } from 'react';
 import AttachmentThumb from '../shared/AttachmentThumb';
 
 export interface InputBarHandle {
@@ -11,6 +11,9 @@ interface Props {
 }
 
 const MAX_VISIBLE_LINES = 10;
+const INPUT_HEIGHT_KEY = 'inputBarHeight';
+const DEFAULT_MIN_HEIGHT = 48;
+const DEFAULT_MAX_HEIGHT = 300;
 
 function CollapsibleText({ text, label, onRemove }: { text: string; label?: string; onRemove: () => void }) {
   const [expanded, setExpanded] = useState(false);
@@ -85,6 +88,13 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [attachments, setAttachments] = useState<string[]>([]);
   const [textAttachments, setTextAttachments] = useState<{ text: string; label?: string }[]>([]);
+  const [textareaHeight, setTextareaHeight] = useState(() => {
+    const saved = localStorage.getItem(INPUT_HEIGHT_KEY);
+    return saved ? Math.max(DEFAULT_MIN_HEIGHT, Math.min(DEFAULT_MAX_HEIGHT, parseInt(saved))) : DEFAULT_MIN_HEIGHT;
+  });
+  const [dragging, setDragging] = useState(false);
+  const dragStartY = useRef(0);
+  const dragStartHeight = useRef(0);
   const chatRef = useRef<HTMLTextAreaElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -157,11 +167,35 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
   }, [value, activeTabId, attachments, textAttachments]);
 
   const autoResize = useCallback(() => {
-    const ta = chatRef.current;
-    if (!ta) return;
-    ta.style.height = '48px';
-    ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
+    // No-op: height is now controlled by the drag handle
   }, []);
+
+  // Drag-to-resize handlers
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setDragging(true);
+    dragStartY.current = e.clientY;
+    dragStartHeight.current = textareaHeight;
+  }, [textareaHeight]);
+
+  useEffect(() => {
+    if (!dragging) return;
+    const handleMove = (e: MouseEvent) => {
+      const delta = dragStartY.current - e.clientY;
+      const newHeight = Math.max(DEFAULT_MIN_HEIGHT, Math.min(DEFAULT_MAX_HEIGHT, dragStartHeight.current + delta));
+      setTextareaHeight(newHeight);
+    };
+    const handleUp = () => {
+      setDragging(false);
+      localStorage.setItem(INPUT_HEIGHT_KEY, String(textareaHeight));
+    };
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+  }, [dragging, textareaHeight]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -253,9 +287,28 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
       style={{
         borderTop: '1px solid var(--border)',
         background: 'var(--bg-primary)',
-        padding: '6px 12px 6px',
+        padding: '0 12px 6px',
       }}
     >
+      {/* Drag handle to resize */}
+      <div
+        onMouseDown={handleDragStart}
+        style={{
+          height: 6,
+          cursor: 'ns-resize',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{
+          width: 32,
+          height: 2,
+          borderRadius: 1,
+          background: dragging ? 'var(--text-secondary)' : 'var(--border)',
+          transition: 'background 0.1s',
+        }} />
+      </div>
       {/* Text attachments (logs) */}
       {textAttachments.map((ta, i) => (
         <CollapsibleText
@@ -315,8 +368,9 @@ const InputBar = forwardRef<InputBarHandle, Props>(({ activeTabId }, ref) => {
             fontSize: 'var(--font-size-terminal)',
             lineHeight: '24px',
             resize: 'none',
-            minHeight: 48,
-            maxHeight: 160,
+            height: textareaHeight,
+            minHeight: DEFAULT_MIN_HEIGHT,
+            maxHeight: DEFAULT_MAX_HEIGHT,
           }}
         />
 
