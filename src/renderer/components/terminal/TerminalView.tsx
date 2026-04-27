@@ -8,10 +8,35 @@ interface Props {
 }
 
 export default function TerminalView({ tabId, isActive, onData }: Props) {
-  const { containerRef, zoomFont, findNext, findPrevious, clearSearch } = useTerminal({ tabId, isActive, onData });
+  const { containerRef, terminal, zoomFont, findNext, findPrevious, clearSearch } = useTerminal({ tabId, isActive, onData });
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isClaudeRunning, setIsClaudeRunning] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // Scan the active buffer for Claude TUI markers — flag clears on its own when xterm switches back from the alternate buffer.
+  useEffect(() => {
+    if (!isActive) return;
+    const scan = (): boolean => {
+      const term = terminal.current;
+      if (!term) return false;
+      const buf = term.buffer.active;
+      const start = buf.viewportY;
+      const end = Math.min(buf.viewportY + term.rows, buf.length);
+      for (let i = start; i < end; i++) {
+        const line = buf.getLine(i);
+        if (!line) continue;
+        const text = line.translateToString(true);
+        if (text.includes('? for shortcuts')) return true;
+        if (text.includes('esc to interrupt')) return true;
+      }
+      return false;
+    };
+    const tick = () => setIsClaudeRunning(scan());
+    tick();
+    const id = setInterval(tick, 1500);
+    return () => clearInterval(id);
+  }, [isActive, terminal]);
 
   // Listen for Cmd+F and terminal zoom from main process
   useEffect(() => {
@@ -22,6 +47,9 @@ export default function TerminalView({ tabId, isActive, onData }: Props) {
         e.preventDefault();
         setSearchOpen(true);
         setTimeout(() => searchRef.current?.focus(), 0);
+      } else if (e.metaKey && e.altKey && e.code === 'KeyV' && isClaudeRunning) {
+        e.preventDefault();
+        window.vibeAPI.pty.write(tabId, '/copy\r');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -32,7 +60,7 @@ export default function TerminalView({ tabId, isActive, onData }: Props) {
       window.removeEventListener('keydown', handleKeyDown);
       cleanupZoom();
     };
-  }, [isActive, zoomFont]);
+  }, [isActive, zoomFont, isClaudeRunning, tabId]);
 
   const handleSearchKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -140,6 +168,41 @@ export default function TerminalView({ tabId, isActive, onData }: Props) {
           overflow: 'hidden',
         }}
       />
+
+      {/* Copy-last-Claude-message button — only visible during Claude sessions */}
+      {isClaudeRunning && (
+        <button
+          onClick={() => window.vibeAPI.pty.write(tabId, '/copy\r')}
+          style={{
+            position: 'absolute',
+            bottom: 6,
+            right: 16,
+            zIndex: 5,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 10px',
+            background: 'rgba(15, 15, 15, 0.85)',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            color: 'var(--text-secondary)',
+            fontSize: 'var(--font-size-sm)',
+            fontFamily: 'var(--font-mono)',
+            cursor: 'pointer',
+            backdropFilter: 'blur(4px)',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          title="Copy last Claude message (⌘⌥V)"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Copy
+        </button>
+      )}
     </div>
   );
 }
