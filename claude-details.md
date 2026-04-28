@@ -194,6 +194,13 @@ A terminal emulator that wraps around Claude Code, adding a split-panel layout w
 - Range: -4px to +8px offset from defaults
 - Cmd+Option+0 resets all to defaults
 
+### Copy Last Claude Message
+- Small Copy icon button at bottom-right of terminal viewport during Claude Code sessions
+- Detection: xterm buffer scan every 1.5s for `? for shortcuts` or `esc to interrupt` strings (Claude TUI footer markers); flag clears naturally when xterm switches back from the alternate buffer
+- Action: writes `/copy\r` to the PTY — leverages Claude Code's built-in `/copy` slash command, which copies the most recent response to the system clipboard (with an interactive picker if the response contains code blocks)
+- Cmd+Option+V keyboard shortcut wired alongside the button (matches on `e.code === 'KeyV'` because Option transforms the key character on macOS)
+- Visual: light gray text → primary on hover, semi-transparent dark background with backdrop blur, matching Flowt action button language
+
 ### Scroll Position Preservation
 - `fit()` saves and restores viewport position when user is scrolled up
 - Prevents jump-to-top during resize while reading history

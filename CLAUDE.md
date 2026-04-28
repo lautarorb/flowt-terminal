@@ -37,6 +37,7 @@ npm run make     # Build DMG for distribution
 - CSP meta tag suppresses Electron security warnings in dev mode
 - Cmd+F opens terminal search bar, Cmd+/- zooms terminal + compose bar font, Cmd+0 resets
 - Cmd+Option+/- zooms all app fonts (terminal, UI, small text), Cmd+Option+0 resets
+- Cmd+Option+V copies the last Claude Code response to clipboard (sends `/copy\r` to the PTY when Claude TUI markers detected in the active buffer); a small Copy icon appears at bottom-right of the terminal during Claude sessions
 - Startup checks for Full Disk Access and prompts user to grant it if missing
 - PTY spawns as login shell (`--login`) with cleaned env (strips ELECTRON_* vars)
 - `fit()` preserves scroll position when user is scrolled up reading history

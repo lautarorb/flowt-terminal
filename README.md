@@ -70,6 +70,9 @@ Cmd+/- changes terminal and compose bar font size (8px–28px). Cmd+0 resets to 
 ### App Font Zoom
 Cmd+Option+/- scales all app fonts (terminal, UI labels, small text). Cmd+Option+0 resets.
 
+### Copy Last Claude Message
+A small Copy icon appears at the bottom-right of the terminal during Claude Code sessions (detected via the TUI's `? for shortcuts` / `esc to interrupt` markers). Click it — or press Cmd+Option+V — to copy Claude's last response to the clipboard via Claude Code's built-in `/copy` slash command.
+
 ### Quick Response
 Detects y/n prompts, numbered choices, and permission requests in terminal output. Shows clickable buttons for one-tap answers.
 
@@ -113,6 +116,7 @@ Output: `out/make/Flowt-VERSION-arm64.dmg`
 | Cmd+0 | Reset terminal font |
 | Cmd+Option+= / - | Zoom all app fonts |
 | Cmd+Option+0 | Reset all app fonts |
+| Cmd+Option+V | Copy last Claude Code response (during Claude sessions) |
 | Ctrl+C | Send SIGINT |
 | Shift+Enter | Newline in input bar |
 | Enter | Send message |

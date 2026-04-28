@@ -46,6 +46,8 @@ Cmd+F opens a search bar in the terminal to find text in the scrollback buffer. 
 
 Cmd+ and Cmd- change the terminal and compose bar font size (8px min, 28px max). Cmd+0 resets to the default 13px. Cmd+Option+ and Cmd+Option- scale all app fonts (terminal, UI labels, small text). Cmd+Option+0 resets.
 
+Cmd+Option+V copies Claude Code's last response to the clipboard during active Claude sessions. A small Copy icon also appears at the bottom-right of the terminal during those sessions, doing the same thing on click. Both work by sending `/copy` to the PTY — Flowt does not parse the buffer; it leverages Claude Code's built-in `/copy` slash command.
+
 ## Screenshot Attach
 
 The "Add screenshot" button on the right panel captures the current state of the preview browser and adds it as an image thumbnail in the chat input bar. You can review it before sending. Screenshots are saved to a `.flowt/` folder inside your project directory so Claude Code can access the file directly.
