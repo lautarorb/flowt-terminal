@@ -1288,4 +1288,41 @@ The advisor feature ships when all of these are true:
 
 ---
 
+## 13. Design Reference
+
+Visual design for the Advisor panel and all related UI states is locked in Pencil. Implementation must match the reference designs at the following node IDs (in `vibeterminal.pen` at the project root):
+
+```
+VfopH, Y9qIXO, BcAWK, WMtNX, a6zq8, ODJMM, EKqQb, uRLPI, kZmkI, qgLWV, WhyvQ
+```
+
+These designs are the **visual contract** for the renderer components defined in §11:
+
+- `AdvisorPanel.tsx`
+- `AdvisorChatList.tsx`
+- `AdvisorMessageBubble.tsx`
+- `AdvisorDraftCard.tsx`
+- `AdvisorConsentModal.tsx`
+- `AdvisorRestartBanner.tsx`
+- `AdvisorStaleBanner.tsx`
+- `AdvisorHooksRemovedBanner.tsx`
+- `AdvisorEmptyState.tsx`
+
+Plus any sub-pieces (e.g., `SendToAdvisorButton.tsx` in `terminal/`).
+
+### Process for the implementer
+
+1. Open `vibeterminal.pen` via the Pencil MCP and inspect the listed node IDs to map them to the components above
+2. Implement each component to match its reference — visual hierarchy, spacing, color tokens, typography, state variants
+3. If a visual decision is required during build that the Pencil designs do not cover, **surface it as a question** rather than improvising
+4. Each task in `project-implementation.md` for a renderer component will reference the specific Pencil node ID(s) for that screen, so the mapping does not need to be re-derived per task
+
+### Visual contract precedence
+
+When the spec text and the Pencil design conflict on a visual matter (spacing, color, typography, layout) — the **Pencil design wins**. When they conflict on a behavioral matter (state machine transitions, IPC channels, data shape, copy text) — the **spec wins**. Pencil is for pixels; the spec is for logic.
+
+The cross-cutting copy reference table in §4 is the **literal text** to use; the Pencil designs may show placeholder strings that should be replaced with the spec's locked copy.
+
+---
+
 *End of functional spec. Next step: run `/project-planner` to convert this spec into a phased implementation plan.*
